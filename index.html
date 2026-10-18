@@ -999,7 +999,7 @@
           <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">Kabuuang Halaga:</span>
           <span id="basket-total-text" class="basket-total-text">₱0</span>
         </div>
-        <button id="ilista-btn" class="btn-ilista touch-target" disabled>
+        <button id="btn-ilista" class="btn-ilista touch-target" disabled>
           <span>✍️</span> Ilista ang Utang (₱0)
         </button>
       </div>
@@ -1208,11 +1208,14 @@
     }
 
     // Toast Notification
-    function showToast(message, isAlert = false) {
+    function showToast(message, type = false) {
       const anchor = document.getElementById("toast-anchor");
+      if (!anchor) return;
+      const isAlert = type === true || type === "warning" || type === "alert" || type === "danger";
+      const icon = isAlert ? "⚠️" : (type === "info" ? "ℹ️" : "✅");
       const toast = document.createElement("div");
       toast.className = `toast-box ${isAlert ? "toast-alert" : ""}`;
-      toast.innerHTML = `<span>${isAlert ? "⚠️" : "✅"}</span> <span>${message}</span>`;
+      toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
       anchor.appendChild(toast);
       setTimeout(() => {
         toast.style.opacity = "0";
@@ -1329,72 +1332,164 @@
       return items.length > 0 ? items.join(", ") : "Pumili ng paninda";
     }
 
-    // Log Debt ("Ilista")
-    function submitDebt() {
-      const cust = getSelectedCustomer();
-      if (!cust) return;
-      const total = getBasketTotal();
-      if (total <= 0) return;
-
-      const isOver = (cust.totalDebt + total) > cust.creditLimit;
-      if (isOver) {
-        playSound('alert');
-      } else {
-        playSound('stamp');
+    // Current Basket helper bridge for seamless compatibility
+    Object.defineProperty(window, "currentBasket", {
+      get() {
+        return {
+          total: getBasketTotal(),
+          summaryText: getBasketSummaryText(),
+          items: activeBasket
+        };
       }
+    });
 
-      const todayStr = getTodayIso();
-      const summary = getBasketSummaryText();
-
-      const newTx = {
-        id: "tx_" + Date.now(),
-        type: "utang",
-        amount: total,
-        items: summary,
-        date: todayStr
-      };
-
-      cust.totalDebt += total;
-      if (!cust.history) cust.history = [];
-      cust.history.unshift(newTx);
-
-      saveData();
-      showToast(`Naitala ang ₱${total} utang ni ${cust.name}!`, isOver);
-
+    function resetBasket() {
       activeBasket = {};
-      selectedInspectedDate = todayStr;
-      renderAll();
+      renderBasket();
+      renderProductGrid();
     }
 
-    // Quick Repayments
-    function handleQuickPay(amount) {
-      const cust = getSelectedCustomer();
-      if (!cust) return;
-      if (cust.totalDebt <= 0) {
-        showToast("Walang natitirang utang ang suki!", false);
-        return;
+    function saveToLocalStorage() {
+      saveData();
+    }
+
+    // State flag to prevent concurrent execution
+    let isProcessingTransaction = false;
+
+    /**
+     * Helper to lock action buttons temporarily
+     * Prevents rapid double-taps and wet/sticky finger spam
+     */
+    function withButtonLock(buttonElement, actionFn, cooldownMs = 450) {
+      if (isProcessingTransaction) return;
+
+      isProcessingTransaction = true;
+      
+      // Visual tactile feedback: disable button and dim slightly
+      if (buttonElement) {
+        buttonElement.disabled = true;
+        buttonElement.style.opacity = "0.6";
+        buttonElement.style.pointerEvents = "none";
       }
 
-      const actualPayment = Math.min(amount, cust.totalDebt);
-      const todayStr = getTodayIso();
+      try {
+        actionFn();
+      } catch (err) {
+        console.error("Transaction error:", err);
+      } finally {
+        // Release lock after cooldown
+        setTimeout(() => {
+          isProcessingTransaction = false;
+          if (buttonElement) {
+            buttonElement.disabled = false;
+            buttonElement.style.opacity = "1";
+            buttonElement.style.pointerEvents = "auto";
+          }
+        }, cooldownMs);
+      }
+    }
 
-      const newTx = {
-        id: "tx_" + Date.now(),
-        type: "payment",
-        amount: actualPayment,
-        date: todayStr
-      };
+    /**
+     * Patched submitDebt with synchronous lock
+     */
+    function submitDebt(event) {
+      const triggerBtn = event?.currentTarget || document.getElementById("btn-ilista") || document.getElementById("ilista-btn");
 
-      cust.totalDebt -= actualPayment;
-      if (!cust.history) cust.history = [];
-      cust.history.unshift(newTx);
+      withButtonLock(triggerBtn, () => {
+        // 1. Validation check: Ensure basket has items
+        if (!currentBasket || currentBasket.total <= 0) {
+          showToast("Pumili muna ng paninda sa speed board!", "warning");
+          return;
+        }
 
-      saveData();
-      playSound('cash');
-      showToast(`Natanggap ang ₱${actualPayment} bayad ni ${cust.name}!`);
+        if (!selectedCustomerId) {
+          showToast("Pumili muna ng suki!", "warning");
+          return;
+        }
 
-      selectedInspectedDate = todayStr;
-      renderAll();
+        // 2. Perform the update
+        const customer = customers.find(c => c.id === selectedCustomerId);
+        if (!customer) return;
+
+        const addedAmount = Number(currentBasket.total.toFixed(2));
+        customer.totalDebt = Number((customer.totalDebt + addedAmount).toFixed(2));
+
+        // 3. Append transaction record
+        const todayStr = new Date().toISOString().split("T")[0];
+        customer.history.unshift({
+          id: "tx_" + Date.now(),
+          type: "utang",
+          amount: addedAmount,
+          items: currentBasket.summaryText || "Staple items",
+          date: todayStr
+        });
+
+        // Tactile audio & calendar date selection
+        if (customer.totalDebt > customer.creditLimit) {
+          playSound('alert');
+        } else {
+          playSound('stamp');
+        }
+        selectedInspectedDate = todayStr;
+
+        // 4. Reset basket & save state
+        resetBasket();
+        saveToLocalStorage();
+        renderAll();
+        
+        showToast(`Nailista: ₱${addedAmount} kay ${customer.name}`, "success");
+      });
+    }
+
+    /**
+     * Patched handleQuickPay with synchronous lock
+     */
+    function handleQuickPay(amount, event) {
+      const triggerBtn = event?.currentTarget;
+
+      withButtonLock(triggerBtn, () => {
+        if (!selectedCustomerId) {
+          showToast("Pumili muna ng suki!", "warning");
+          return;
+        }
+
+        const customer = customers.find(c => c.id === selectedCustomerId);
+        if (!customer) return;
+
+        if (customer.totalDebt <= 0) {
+          showToast("Wala nang natitirang utang!", "info");
+          return;
+        }
+
+        // Determine actual payment deduction (cannot pay more than current debt)
+        let paymentAmount = amount === "FULL" ? customer.totalDebt : Number(amount);
+        if (paymentAmount > customer.totalDebt) {
+          paymentAmount = customer.totalDebt;
+        }
+        paymentAmount = Number(paymentAmount.toFixed(2));
+
+        // Deduct
+        customer.totalDebt = Number((customer.totalDebt - paymentAmount).toFixed(2));
+
+        // Log transaction
+        const todayStr = new Date().toISOString().split("T")[0];
+        customer.history.unshift({
+          id: "tx_" + Date.now(),
+          type: "payment",
+          amount: paymentAmount,
+          date: todayStr
+        });
+
+        // Tactile audio & calendar date selection
+        playSound('cash');
+        selectedInspectedDate = todayStr;
+
+        // Save & update UI
+        saveToLocalStorage();
+        renderAll();
+
+        showToast(`Bayad natanggap: ₱${paymentAmount}`, "success");
+      });
     }
 
     // Render Methods
@@ -1639,18 +1734,20 @@
     function renderBasket() {
       const previewEl = document.getElementById("basket-items-preview");
       const totalEl = document.getElementById("basket-total-text");
-      const btn = document.getElementById("ilista-btn");
+      const btn = document.getElementById("btn-ilista") || document.getElementById("ilista-btn");
 
       const total = getBasketTotal();
       previewEl.textContent = getBasketSummaryText();
       totalEl.textContent = `₱${total.toLocaleString()}`;
 
-      if (total > 0) {
-        btn.disabled = false;
-        btn.innerHTML = `<span>✍️</span> Ilista ang Utang (₱${total.toLocaleString()})`;
-      } else {
-        btn.disabled = true;
-        btn.innerHTML = `<span>✍️</span> Ilista ang Utang (₱0)`;
+      if (btn) {
+        if (total > 0) {
+          btn.disabled = false;
+          btn.innerHTML = `<span>✍️</span> Ilista ang Utang (₱${total.toLocaleString()})`;
+        } else {
+          btn.disabled = true;
+          btn.innerHTML = `<span>✍️</span> Ilista ang Utang (₱0)`;
+        }
       }
     }
 
@@ -1743,21 +1840,21 @@
 
       // Clear Basket & Ilista
       document.getElementById("clear-basket-btn").addEventListener("click", clearBasket);
-      document.getElementById("ilista-btn").addEventListener("click", submitDebt);
+      const ilistaBtn = document.getElementById("btn-ilista") || document.getElementById("ilista-btn");
+      if (ilistaBtn) {
+        ilistaBtn.addEventListener("click", (e) => submitDebt(e));
+      }
 
       // Quick Pay Chips
       document.querySelectorAll(".pay-chip[data-pay]").forEach(chip => {
-        chip.addEventListener("click", () => {
+        chip.addEventListener("click", (e) => {
           const amt = parseInt(chip.getAttribute("data-pay"), 10);
-          handleQuickPay(amt);
+          handleQuickPay(amt, e);
         });
       });
 
-      document.getElementById("pay-full-chip").addEventListener("click", () => {
-        const cust = getSelectedCustomer();
-        if (cust && cust.totalDebt > 0) {
-          handleQuickPay(cust.totalDebt);
-        }
+      document.getElementById("pay-full-chip").addEventListener("click", (e) => {
+        handleQuickPay("FULL", e);
       });
     }
 
