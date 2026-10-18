@@ -3,65 +3,69 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>SariSync - Visual Credit & Repayment Speed Board</title>
+  <title>SariSync Speed Board - Talaan ng Bayan</title>
   <style>
-    /* CSS Custom Properties for Dark & Light Mode */
+    /* CSS Custom Properties & High-Contrast Design System */
     :root {
       /* Dark Mode (Default) */
-      --bg-color: #0f172a;
-      --card-bg: #1e293b;
-      --card-alt-bg: #111e33;
+      --bg-backdrop: #020617;
+      --bg-app: #0f172a;
+      --bg-card: #1e293b;
+      --bg-card-alt: #111e33;
       --border-color: #334155;
+      --border-bold: #475569;
       --text-primary: #f8fafc;
       --text-muted: #94a3b8;
       --cell-bg: #152238;
       --cell-hover: #334155;
       --input-bg: #0f172a;
       
-      /* Semantic Accents */
+      /* Standardized Accents */
       --accent-green: #10b981;
       --accent-green-dark: #059669;
       --accent-green-bg: rgba(16, 185, 129, 0.15);
-      --caution-amber: #f59e0b;
-      --caution-amber-bg: rgba(245, 158, 11, 0.15);
-      --alert-red: #ef4444;
-      --alert-red-dark: #dc2626;
-      --alert-red-bg: rgba(239, 68, 68, 0.15);
+      --accent-amber: #f59e0b;
+      --accent-amber-bg: rgba(245, 158, 11, 0.15);
+      --accent-rose: #ef4444;
+      --accent-rose-dark: #dc2626;
+      --accent-rose-bg: rgba(239, 68, 68, 0.15);
       
       --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
       --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
       --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
-      
+
       --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       --radius-sm: 8px;
       --radius-md: 12px;
       --radius-lg: 16px;
     }
 
-    /* Light Mode (Sunlight-Optimized High Contrast) */
+    /* Light Mode (Sunlight-Proof / WCAG AAA Glare Resistant) */
     [data-theme="light"] {
-      --bg-color: #f1f5f9;
-      --card-bg: #ffffff;
-      --card-alt-bg: #f8fafc;
-      --border-color: #cbd5e1;
-      --text-primary: #0f172a;
-      --text-muted: #475569;
+      --bg-backdrop: #e2e8f0;
+      --bg-app: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-card-alt: #f1f5f9;
+      --border-color: #94a3b8; /* Slate 400 bold borders */
+      --border-bold: #64748b;
+      --text-primary: #020617; /* Near black, 14:1 contrast */
+      --text-muted: #1e293b;   /* Deep slate, 9.2:1 contrast */
       --cell-bg: #f1f5f9;
       --cell-hover: #e2e8f0;
-      --input-bg: #f8fafc;
+      --input-bg: #ffffff;
       
       --accent-green: #059669;
       --accent-green-dark: #047857;
-      --accent-green-bg: rgba(5, 150, 105, 0.12);
-      --caution-amber: #d97706;
-      --caution-amber-bg: rgba(217, 119, 6, 0.12);
-      --alert-red: #dc2626;
-      --alert-red-dark: #b91c1c;
-      --alert-red-bg: rgba(220, 38, 38, 0.12);
+      --accent-green-bg: rgba(5, 150, 105, 0.15);
+      --accent-amber: #d97706;
+      --accent-amber-bg: rgba(217, 119, 6, 0.15);
+      --accent-rose: #dc2626;
+      --accent-rose-dark: #b91c1c;
+      --accent-rose-bg: rgba(220, 38, 38, 0.15);
       
-      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08);
-      --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.1);
-      --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.12);
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.1);
+      --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.15);
+      --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.2);
     }
 
     * {
@@ -73,7 +77,7 @@
     }
 
     body {
-      background-color: var(--bg-color);
+      background-color: var(--bg-backdrop);
       color: var(--text-primary);
       font-family: var(--font-family);
       min-height: 100vh;
@@ -85,41 +89,54 @@
       transition: background-color 0.2s ease, color 0.2s ease;
     }
 
+    /* Mobile-First Layout (Max width 480px, Centered on Desktop) */
     #app-container {
       width: 100%;
       max-width: 480px;
       min-height: 100vh;
-      background-color: var(--bg-color);
+      background-color: var(--bg-app);
       display: flex;
       flex-direction: column;
       position: relative;
-      padding-bottom: 32px;
+      padding-bottom: 24px;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.35);
       transition: background-color 0.2s ease;
     }
 
-    /* Tactile Touch Target Rule (Minimum 52px height) */
+    /* Tactile Touch Target Rules (Min 48px - 54px with active scale-down) */
     .touch-target,
     button,
     .product-tile,
     .customer-chip,
+    .tingi-pill,
     .pay-chip {
       touch-action: manipulation;
       cursor: pointer;
-      transition: transform 0.08s ease, background-color 0.15s ease, border-color 0.15s ease;
+      min-height: 48px;
+      transition: transform 0.08s ease, background-color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
     }
 
     .touch-target:active,
     button:active,
     .product-tile:active,
     .customer-chip:active,
+    .tingi-pill:active,
     .pay-chip:active {
-      transform: scale(0.95);
+      transform: scale(0.96);
     }
 
-    /* Top Quick Header */
+    button:disabled,
+    .touch-target.is-disabled {
+      opacity: 0.55 !important;
+      pointer-events: none !important;
+      cursor: not-allowed !important;
+      transform: none !important;
+    }
+
+    /* 1. Header Bar */
     .app-header {
-      background: var(--card-bg);
-      border-bottom: 1px solid var(--border-color);
+      background: var(--bg-card);
+      border-bottom: 2px solid var(--border-color);
       padding: 12px 16px;
       position: sticky;
       top: 0;
@@ -130,22 +147,38 @@
       box-shadow: var(--shadow-sm);
     }
 
-    .header-left {
+    .brand-block {
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
-    .brand-logo {
-      font-size: 24px;
+    .brand-icon {
+      font-size: 26px;
       line-height: 1;
     }
 
+    .brand-titles {
+      display: flex;
+      flex-direction: column;
+    }
+
     .brand-name {
-      font-size: 17px;
-      font-weight: 800;
+      font-size: 18px;
+      font-weight: 900;
       letter-spacing: -0.4px;
       color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .brand-sub {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
     }
 
     .header-actions {
@@ -155,97 +188,97 @@
     }
 
     .icon-btn {
-      background: var(--card-alt-bg);
+      background: var(--bg-card-alt);
       border: 1px solid var(--border-color);
       color: var(--text-primary);
-      width: 42px;
-      height: 42px;
-      min-height: 42px;
+      width: 44px;
+      height: 44px;
+      min-height: 44px;
       border-radius: var(--radius-sm);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 17px;
+      font-size: 18px;
     }
 
-    /* Key Metric: Total Collectibles (₱) */
-    .total-collectible-card {
-      background: var(--card-bg);
-      border-bottom: 1px solid var(--border-color);
+    /* Aggregated Counter Metric: Kabuuang Pautang */
+    .metric-counter-banner {
+      background: var(--bg-card);
+      border-bottom: 2px solid var(--border-color);
       padding: 14px 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
-    .collectible-label {
+    .metric-label {
       font-size: 11px;
       text-transform: uppercase;
       font-weight: 800;
       color: var(--text-muted);
-      letter-spacing: 0.5px;
+      letter-spacing: 0.6px;
       margin-bottom: 2px;
     }
 
-    .collectible-value {
+    .metric-value {
       font-size: 30px;
       font-weight: 900;
       color: var(--accent-green);
       letter-spacing: -0.6px;
     }
 
-    .header-pills-group {
+    .metric-badges {
       display: flex;
       flex-direction: column;
       align-items: flex-end;
       gap: 4px;
     }
 
-    .mini-pill {
+    .badge-pill {
       font-size: 11px;
       font-weight: 800;
       padding: 3px 9px;
       border-radius: 999px;
       display: inline-flex;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
     }
 
-    .pill-muted {
-      background: var(--card-alt-bg);
+    .badge-pill-muted {
+      background: var(--bg-card-alt);
       color: var(--text-muted);
       border: 1px solid var(--border-color);
     }
 
-    .pill-alert {
-      background: var(--alert-red-bg);
-      color: var(--alert-red);
-      border: 1px solid rgba(239, 68, 68, 0.4);
+    .badge-pill-alert {
+      background: var(--accent-rose-bg);
+      color: var(--accent-rose);
+      border: 1px solid var(--accent-rose);
     }
 
-    /* Customer Visual Chips (Horizontal Scroll) */
-    .customer-chips-section {
+    /* 2. Customer Selector Ribbon */
+    .customer-ribbon-section {
       padding: 12px 16px 8px;
     }
 
-    .customer-chips-scroll {
+    .customer-scroll-row {
       display: flex;
       gap: 8px;
       overflow-x: auto;
-      padding-bottom: 6px;
+      padding-bottom: 4px;
       scrollbar-width: none;
     }
 
-    .customer-chips-scroll::-webkit-scrollbar {
+    .customer-scroll-row::-webkit-scrollbar {
       display: none;
     }
 
     .customer-chip {
-      background: var(--card-bg);
+      background: var(--bg-card);
       border: 2px solid var(--border-color);
       border-radius: var(--radius-md);
       padding: 8px 12px;
-      min-width: 128px;
+      min-width: 130px;
       min-height: 52px;
       flex-shrink: 0;
       display: flex;
@@ -261,12 +294,12 @@
     }
 
     .customer-chip.alert-state {
-      border-color: var(--alert-red);
+      border-color: var(--accent-rose);
     }
 
     .customer-chip.alert-state.active {
-      background: var(--alert-red-bg);
-      box-shadow: 0 0 0 1px var(--alert-red);
+      background: var(--accent-rose-bg);
+      box-shadow: 0 0 0 1px var(--accent-rose);
     }
 
     .chip-avatar {
@@ -274,7 +307,7 @@
       line-height: 1;
     }
 
-    .chip-content {
+    .chip-meta {
       display: flex;
       flex-direction: column;
       min-width: 0;
@@ -290,100 +323,165 @@
 
     .chip-name {
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 800;
       color: var(--text-primary);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .status-dot {
-      width: 9px;
-      height: 9px;
+    .traffic-dot {
+      width: 10px;
+      height: 10px;
       border-radius: 50%;
       flex-shrink: 0;
+      border: 1px solid rgba(0, 0, 0, 0.2);
     }
 
-    .dot-green { background-color: var(--accent-green); box-shadow: 0 0 6px var(--accent-green); }
-    .dot-yellow { background-color: var(--caution-amber); box-shadow: 0 0 6px var(--caution-amber); }
-    .dot-red { background-color: var(--alert-red); box-shadow: 0 0 6px var(--alert-red); }
+    .dot-safe { background-color: var(--accent-green); box-shadow: 0 0 6px var(--accent-green); }
+    .dot-watch { background-color: var(--accent-amber); box-shadow: 0 0 6px var(--accent-amber); }
+    .dot-danger { background-color: var(--accent-rose); box-shadow: 0 0 6px var(--accent-rose); }
 
     .chip-debt-text {
       font-size: 15px;
-      font-weight: 800;
+      font-weight: 900;
     }
 
-    /* Active Customer Detail & Calendar Card */
-    .customer-calendar-card {
-      margin: 4px 16px 12px;
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
+    /* 3. Customer Credit & Risk Card */
+    .customer-profile-card {
+      margin: 4px 16px 10px;
+      background: var(--bg-card);
+      border: 2px solid var(--border-color);
       border-radius: var(--radius-lg);
       padding: 14px 16px;
       box-shadow: var(--shadow-md);
-      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
 
-    .cust-summary-row {
+    .profile-top-row {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
+      align-items: flex-start;
     }
 
-    .cust-title-wrap {
+    .profile-info h2 {
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: -0.4px;
+      color: var(--text-primary);
+    }
+
+    .profile-phone {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .profile-debt-block {
+      text-align: right;
+    }
+
+    .profile-debt-amt {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+    }
+
+    .profile-limit-text {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    /* Credit Limit Meter Bar */
+    .credit-progress-bar {
+      width: 100%;
+      height: 8px;
+      background: var(--cell-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .credit-progress-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.3s ease, background-color 0.3s ease;
+    }
+
+    /* AI-Style Rule-Based Advisory Banner */
+    .advisory-banner {
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 800;
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
-    .cust-title-wrap h2 {
-      font-size: 18px;
-      font-weight: 800;
-      letter-spacing: -0.3px;
+    .advisory-danger {
+      background: var(--accent-rose-bg);
+      color: var(--accent-rose);
+      border: 1px solid var(--accent-rose);
+    }
+
+    .advisory-watch {
+      background: var(--accent-amber-bg);
+      color: var(--accent-amber);
+      border: 1px solid var(--accent-amber);
+    }
+
+    .advisory-safe {
+      background: var(--accent-green-bg);
+      color: var(--accent-green);
+      border: 1px solid var(--accent-green);
+    }
+
+    /* 1-Tap Kasunduan SMS Button */
+    .btn-kasunduan {
+      background: var(--bg-card-alt);
+      border: 1.5px solid var(--border-color);
       color: var(--text-primary);
-    }
-
-    .debt-badge {
-      font-size: 19px;
-      font-weight: 900;
-      letter-spacing: -0.4px;
-    }
-
-    /* Limit Meter Progress Bar */
-    .credit-meter-bar {
+      border-radius: var(--radius-sm);
+      min-height: 44px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
       width: 100%;
-      height: 7px;
-      background: var(--cell-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 999px;
-      overflow: hidden;
-      margin-bottom: 12px;
     }
 
-    .credit-meter-fill {
-      height: 100%;
-      transition: width 0.3s ease, background-color 0.3s ease;
-      border-radius: 999px;
+    /* 4. Interactive Mini Calendar (Presbyopia Accessible) */
+    .calendar-container {
+      margin: 0 16px 12px;
+      background: var(--bg-card);
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 12px 14px;
+      box-shadow: var(--shadow-sm);
     }
 
-    /* Calendar Header & Status Pill */
     .calendar-header-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding-top: 6px;
       margin-bottom: 8px;
-      border-top: 1px solid var(--border-color);
     }
 
-    .cal-month-title {
-      font-size: 13px;
-      font-weight: 800;
-      color: var(--text-primary);
+    .cal-title-block {
       display: flex;
       align-items: center;
       gap: 6px;
+      font-size: 14px;
+      font-weight: 900;
+      color: var(--text-primary);
     }
 
     .cal-nav-btn {
@@ -392,30 +490,25 @@
       color: var(--text-muted);
       font-size: 14px;
       cursor: pointer;
-      padding: 2px 6px;
+      padding: 4px 8px;
       min-height: auto;
     }
 
-    .cal-nav-btn:hover {
-      color: var(--text-primary);
-    }
-
-    .last-borrowed-pill {
+    .last-utang-pill {
       font-size: 11px;
-      font-weight: 700;
-      padding: 3px 8px;
+      font-weight: 800;
+      padding: 3px 9px;
       border-radius: 999px;
-      background: var(--card-alt-bg);
+      background: var(--bg-card-alt);
       color: var(--text-muted);
       border: 1px solid var(--border-color);
     }
 
-    /* Interactive Calendar Grid */
     .cal-weekdays {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       text-align: center;
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 800;
       color: var(--text-muted);
       text-transform: uppercase;
@@ -430,7 +523,7 @@
     }
 
     .cal-cell {
-      aspect-ratio: 1;
+      min-height: 44px;
       background: var(--cell-bg);
       border-radius: 6px;
       display: flex;
@@ -440,20 +533,16 @@
       position: relative;
       cursor: pointer;
       border: 1px solid transparent;
-      transition: all 0.12s ease;
     }
 
     .cal-cell.empty {
       background: transparent;
       cursor: default;
-    }
-
-    .cal-cell:hover:not(.empty) {
-      border-color: var(--border-color);
+      border: none;
     }
 
     .cal-cell.is-today {
-      border-color: var(--accent-green);
+      border: 2px solid var(--accent-green);
       font-weight: 900;
     }
 
@@ -463,73 +552,75 @@
       box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
     }
 
-    .cal-day-num {
-      font-size: 11px;
-      font-weight: 700;
+    .cal-day-number {
+      font-size: 12px;
+      font-weight: 800;
       line-height: 1;
       color: var(--text-primary);
     }
 
-    .cal-dots-wrap {
+    /* 9px Presbyopia Accessible Dots */
+    .cal-marker-row {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 2px;
+      gap: 3px;
       margin-top: 3px;
-      min-height: 6px;
+      min-height: 10px;
     }
 
     .cal-dot {
-      width: 5px;
-      height: 5px;
+      width: 9px;
+      height: 9px;
       border-radius: 50%;
+      border: 1px solid rgba(0, 0, 0, 0.3);
     }
 
     .cal-dot-utang {
-      background-color: var(--alert-red);
-      box-shadow: 0 0 4px var(--alert-red);
+      background-color: var(--accent-rose);
+      box-shadow: 0 0 5px var(--accent-rose);
     }
 
     .cal-dot-payment {
       background-color: var(--accent-green);
-      box-shadow: 0 0 4px var(--accent-green);
+      box-shadow: 0 0 5px var(--accent-green);
     }
 
-    /* Split Indicator (Dual Dot / Split Badge for days with both utang and bayad) */
-    .cal-split-pill {
+    .cal-split-indicator {
       display: flex;
-      width: 12px;
-      height: 5px;
+      width: 14px;
+      height: 9px;
       border-radius: 999px;
       overflow: hidden;
+      border: 1px solid rgba(0, 0, 0, 0.3);
     }
 
-    .cal-split-left {
+    .split-utang {
       width: 50%;
       height: 100%;
-      background-color: var(--alert-red);
+      background-color: var(--accent-rose);
     }
 
-    .cal-split-right {
+    .split-payment {
       width: 50%;
       height: 100%;
       background-color: var(--accent-green);
     }
 
-    /* Calendar Day Detail Inspection Card */
-    .cal-inspect-card {
-      background: var(--card-alt-bg);
-      border: 1px solid var(--border-color);
+    /* Calendar Day Detail Inspection Popover */
+    .cal-inspect-popover {
+      background: var(--bg-card-alt);
+      border: 1.5px solid var(--border-color);
       border-radius: var(--radius-sm);
       padding: 10px 12px;
       font-size: 12px;
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      gap: 4px;
     }
 
-    .inspect-date-title {
-      font-size: 11px;
+    .inspect-header {
+      font-size: 12px;
       font-weight: 800;
       color: var(--text-muted);
       display: flex;
@@ -537,50 +628,85 @@
       align-items: center;
     }
 
-    .inspect-item-row {
+    .inspect-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 8px;
     }
 
-    .inspect-item-desc {
-      font-weight: 600;
+    .inspect-desc {
+      font-weight: 700;
       color: var(--text-primary);
     }
 
-    .inspect-item-amt {
-      font-weight: 800;
+    .inspect-amount {
+      font-weight: 900;
+      text-align: right;
     }
 
-    /* One-Tap Staple Speed Board */
-    .speed-board-section {
-      padding: 0 16px 12px;
+    /* Lower 60% Ergonomic Thumb Zone */
+    .thumb-zone {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 0 16px;
     }
 
-    .section-header-title {
+    /* 5. Micro-Credit "Tingi" Bar */
+    .tingi-bar-section {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .section-headline {
       font-size: 11px;
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.6px;
       color: var(--text-muted);
-      margin-bottom: 8px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
-    .product-grid {
+    .tingi-pill-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+
+    .tingi-pill {
+      background: var(--bg-card);
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .tingi-pill:active {
+      border-color: var(--accent-green);
+      background: var(--accent-green-bg);
+    }
+
+    /* 6. Staple Speed Board Grid */
+    .speed-board-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 8px;
     }
 
     .product-tile {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
+      background: var(--bg-card);
+      border: 2px solid var(--border-color);
       border-radius: var(--radius-md);
-      min-height: 54px;
+      min-height: 52px;
       padding: 8px 10px;
       display: flex;
       align-items: center;
@@ -594,41 +720,41 @@
       background: var(--accent-green-bg);
     }
 
-    .product-tile-left {
+    .tile-left {
       display: flex;
       align-items: center;
       gap: 8px;
       min-width: 0;
     }
 
-    .prod-emoji {
+    .tile-emoji {
       font-size: 26px;
       line-height: 1;
       flex-shrink: 0;
     }
 
-    .prod-info {
+    .tile-info {
       display: flex;
       flex-direction: column;
       min-width: 0;
     }
 
-    .prod-name {
+    .tile-name {
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 800;
       color: var(--text-primary);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .prod-price {
+    .tile-price {
       font-size: 13px;
-      font-weight: 800;
+      font-weight: 900;
       color: var(--accent-green);
     }
 
-    .prod-badge {
+    .tile-badge {
       background: var(--accent-green);
       color: #ffffff;
       font-size: 12px;
@@ -642,26 +768,19 @@
       flex-shrink: 0;
     }
 
-    /* Action Bar & Quick Repayments */
-    .action-panel {
-      padding: 0 16px 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .basket-bar-card {
-      background: var(--card-bg);
+    /* 7. Action Drawer / Sticky Counter Bar */
+    .basket-counter-card {
+      background: var(--bg-card);
       border: 2px solid var(--accent-green);
       border-radius: var(--radius-lg);
       padding: 12px 14px;
       display: flex;
       flex-direction: column;
       gap: 8px;
-      box-shadow: 0 4px 12px var(--accent-green-bg);
+      box-shadow: 0 4px 14px var(--accent-green-bg);
     }
 
-    .basket-top-row {
+    .basket-header-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -669,16 +788,39 @@
 
     .basket-items-preview {
       font-size: 12px;
+      font-weight: 700;
       color: var(--text-muted);
-      font-weight: 600;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 260px;
+      max-width: 270px;
     }
 
-    .basket-total-text {
-      font-size: 24px;
+    .btn-clear-basket {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 800;
+      text-decoration: underline;
+      cursor: pointer;
+      min-height: auto;
+    }
+
+    .basket-total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .basket-total-label {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .basket-total-amount {
+      font-size: 26px;
       font-weight: 900;
       color: var(--accent-green);
     }
@@ -698,32 +840,16 @@
       box-shadow: var(--shadow-md);
     }
 
-    .btn-ilista:disabled {
-      background: var(--border-color);
-      color: var(--text-muted);
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-
-    /* Quick Pay Row */
-    .quick-pay-wrap {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
+    /* 8. Quick Repayment Row */
+    .quick-pay-card {
+      background: var(--bg-card);
+      border: 2px solid var(--border-color);
       border-radius: var(--radius-lg);
       padding: 12px;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .quick-pay-label {
-      font-size: 11px;
-      font-weight: 800;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 8px;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: var(--shadow-sm);
     }
 
     .pay-chips-grid {
@@ -733,8 +859,8 @@
     }
 
     .pay-chip {
-      background: var(--card-alt-bg);
-      border: 1px solid var(--border-color);
+      background: var(--bg-card-alt);
+      border: 2px solid var(--border-color);
       border-radius: var(--radius-sm);
       min-height: 52px;
       display: flex;
@@ -743,7 +869,7 @@
       justify-content: center;
       color: var(--text-primary);
       font-size: 13px;
-      font-weight: 800;
+      font-weight: 900;
     }
 
     .pay-chip.full-pay {
@@ -753,17 +879,14 @@
       font-size: 11px;
       font-weight: 900;
       text-align: center;
+      line-height: 1.1;
       padding: 2px 4px;
     }
 
-    /* Recent Activity Timeline */
-    .timeline-section {
-      padding: 0 16px;
-    }
-
+    /* 9. Recent Activity Drawer */
     .timeline-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
+      background: var(--bg-card);
+      border: 2px solid var(--border-color);
       border-radius: var(--radius-lg);
       padding: 12px 14px;
       box-shadow: var(--shadow-sm);
@@ -773,13 +896,14 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
+      margin-top: 6px;
     }
 
-    .timeline-row {
+    .timeline-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: var(--card-alt-bg);
+      background: var(--bg-card-alt);
       border: 1px solid var(--border-color);
       border-radius: var(--radius-sm);
       padding: 8px 10px;
@@ -787,15 +911,15 @@
       border-left: 4px solid transparent;
     }
 
-    .timeline-row.is-utang {
-      border-left-color: var(--alert-red);
+    .timeline-item.is-utang {
+      border-left-color: var(--accent-rose);
     }
 
-    .timeline-row.is-payment {
+    .timeline-item.is-payment {
       border-left-color: var(--accent-green);
     }
 
-    .timeline-row-left {
+    .timeline-left {
       display: flex;
       align-items: center;
       gap: 8px;
@@ -810,14 +934,14 @@
       flex-shrink: 0;
     }
 
-    .timeline-details {
+    .timeline-meta {
       display: flex;
       flex-direction: column;
       min-width: 0;
     }
 
-    .timeline-item-tag {
-      font-weight: 700;
+    .timeline-tags {
+      font-weight: 800;
       color: var(--text-primary);
       white-space: nowrap;
       overflow: hidden;
@@ -826,54 +950,141 @@
 
     .timeline-date {
       font-size: 10px;
+      font-weight: 700;
       color: var(--text-muted);
     }
 
     .timeline-amt {
       font-size: 15px;
       font-weight: 900;
-      flex-shrink: 0;
       text-align: right;
+      flex-shrink: 0;
     }
 
-    .timeline-empty {
+    /* 10. Full-Screen Sukli (Change) Modal (Bug 1.3 Resolution) */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(2, 6, 23, 0.88);
+      backdrop-filter: blur(6px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-backdrop.is-active {
+      display: flex;
+    }
+
+    .sukli-modal-card {
+      background: var(--bg-card);
+      border: 3px solid var(--accent-green);
+      border-radius: var(--radius-lg);
+      padding: 28px 20px;
+      width: 100%;
+      max-width: 420px;
       text-align: center;
-      font-size: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+      animation: modalScaleUp 0.18s ease-out;
+    }
+
+    @keyframes modalScaleUp {
+      from { transform: scale(0.92); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .sukli-header-title {
+      font-size: 16px;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--accent-green);
+      letter-spacing: 0.5px;
+    }
+
+    .sukli-cust-name {
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--text-primary);
+    }
+
+    .sukli-giant-amount {
+      font-size: 52px;
+      font-weight: 900;
+      color: var(--accent-green);
+      letter-spacing: -1px;
+      line-height: 1.1;
+      padding: 10px 0;
+      background: var(--accent-green-bg);
+      border-radius: var(--radius-md);
+      border: 2px dashed var(--accent-green);
+    }
+
+    .sukli-detail-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      font-weight: 800;
       color: var(--text-muted);
-      padding: 12px 0;
+      border-top: 1px solid var(--border-color);
+      padding-top: 10px;
+    }
+
+    .btn-dismiss-sukli {
+      background: var(--accent-green);
+      color: #ffffff;
+      border: none;
+      border-radius: var(--radius-md);
+      min-height: 54px;
+      font-size: 18px;
+      font-weight: 900;
+      box-shadow: var(--shadow-md);
     }
 
     /* Toast Notification */
-    .toast-box {
+    .toast-container {
       position: fixed;
       top: 16px;
       left: 50%;
       transform: translateX(-50%);
-      z-index: 100;
-      background: var(--card-bg);
-      border: 1px solid var(--accent-green);
+      z-index: 120;
+      pointer-events: none;
+      width: 90%;
+      max-width: 380px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .toast-box {
+      background: var(--bg-card);
+      border: 2px solid var(--accent-green);
       color: var(--text-primary);
-      padding: 10px 16px;
+      padding: 12px 16px;
       border-radius: var(--radius-md);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 800;
       display: flex;
       align-items: center;
       gap: 8px;
-      pointer-events: none;
       animation: fadeInDown 0.2s ease-out;
-      width: 90%;
-      max-width: 380px;
     }
 
     .toast-box.toast-alert {
-      border-color: var(--alert-red);
+      border-color: var(--accent-rose);
     }
 
     @keyframes fadeInDown {
-      from { opacity: 0; transform: translate(-50%, -10px); }
-      to { opacity: 1; transform: translate(-50%, 0); }
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
@@ -882,231 +1093,326 @@
   <div id="app-container">
 
     <!-- Toast Notification Anchor -->
-    <div id="toast-anchor"></div>
+    <div id="toast-container" class="toast-container"></div>
 
-    <!-- Top Quick Header -->
+    <!-- 1. Header Bar -->
     <header class="app-header">
-      <div class="header-left">
-        <span class="brand-logo">🏪</span>
-        <span class="brand-name">SariSync</span>
+      <div class="brand-block">
+        <span class="brand-icon">🏪</span>
+        <div class="brand-titles">
+          <span class="brand-name">SariSync</span>
+          <span class="brand-sub">Talaan ng Bayan</span>
+        </div>
       </div>
       <div class="header-actions">
-        <!-- Dark / Light Mode Toggle Button -->
-        <button id="theme-toggle-btn" class="icon-btn touch-target" title="I-toggle ang Theme" aria-label="Toggle Theme">☀️</button>
-        <!-- Audio Feedback Toggle -->
-        <button id="sound-btn" class="icon-btn touch-target" title="Tunog" aria-label="Toggle Sound">🔊</button>
-        <!-- Reset Data Button -->
-        <button id="reset-btn" class="icon-btn touch-target" title="Reset Mock Data" aria-label="Reset Data">🔄</button>
+        <!-- Sunlight-Proof Dual Mode Toggle Button -->
+        <button id="btn-theme-toggle" class="icon-btn touch-target" title="I-toggle ang Theme" aria-label="Toggle Theme">☀️</button>
+        <!-- Web Audio Mute/Unmute Toggle -->
+        <button id="btn-sound-toggle" class="icon-btn touch-target" title="Tunog" aria-label="Toggle Sound">🔊</button>
+        <!-- Restore Initial Mock Data -->
+        <button id="btn-reset-data" class="icon-btn touch-target" title="Reset Mock Data" aria-label="Reset Data">🔄</button>
       </div>
     </header>
 
-    <!-- Key Metric: Total Collectibles (₱) -->
-    <section class="total-collectible-card">
+    <!-- Aggregated Counter Metric: Kabuuang Pautang -->
+    <section class="metric-counter-banner">
       <div>
-        <div class="collectible-label">Total Collectibles</div>
-        <div id="metric-total-collectible" class="collectible-value">₱0</div>
+        <div class="metric-label">Kabuuang Pautang</div>
+        <div id="metric-total-debt" class="metric-value">₱0.00</div>
       </div>
-      <div class="header-pills-group">
-        <span id="pill-active-accounts" class="mini-pill pill-muted">3 Suki</span>
-        <span id="pill-flagged-accounts" class="mini-pill pill-alert" style="display: none;">1 Flagged</span>
+      <div class="metric-badges">
+        <span id="badge-total-accounts" class="badge-pill badge-pill-muted">3 Suki</span>
+        <span id="badge-flagged-accounts" class="badge-pill badge-pill-alert" style="display: none;">1 Flagged</span>
       </div>
     </section>
 
-    <!-- Customer Visual Chips (Horizontal Scroll) -->
-    <section class="customer-chips-section">
-      <div class="customer-chips-scroll" id="customer-chips-container">
+    <!-- 2. Customer Selector Ribbon -->
+    <section class="customer-ribbon-section">
+      <div class="customer-scroll-row" id="customer-chips-row">
         <!-- Rendered via JS -->
       </div>
     </section>
 
-    <!-- Active Customer Profile & Interactive Debt Calendar -->
-    <section class="customer-calendar-card" id="customer-calendar-card">
-      <div class="cust-summary-row">
-        <div class="cust-title-wrap">
-          <span id="active-cust-avatar" style="font-size: 26px;">👵</span>
-          <div>
-            <h2 id="active-cust-name">Aling Nena</h2>
-            <div id="active-cust-phone" style="font-size: 11px; color: var(--text-muted);">0917-123-4567</div>
-          </div>
+    <!-- 3. Customer Credit & Risk Card -->
+    <section class="customer-profile-card" id="customer-profile-card">
+      <div class="profile-top-row">
+        <div class="profile-info">
+          <h2 id="prof-cust-name">Aling Nena</h2>
+          <div class="profile-phone" id="prof-cust-phone">📱 0917-123-4567</div>
         </div>
-        <div style="text-align: right;">
-          <div id="active-cust-debt" class="debt-badge">₱320</div>
-          <div id="active-cust-limit" style="font-size: 11px; color: var(--text-muted);">Limit: ₱600</div>
+        <div class="profile-debt-block">
+          <div class="profile-debt-amt" id="prof-cust-debt">₱320.00</div>
+          <div class="profile-limit-text" id="prof-cust-limit">Limit: ₱600.00</div>
         </div>
       </div>
 
-      <!-- Credit Limit Progress Bar -->
-      <div class="credit-meter-bar">
-        <div id="credit-meter-fill" class="credit-meter-fill" style="width: 53%; background-color: var(--caution-amber);"></div>
+      <!-- Credit Progress Bar -->
+      <div class="credit-progress-bar">
+        <div id="credit-progress-fill" class="credit-progress-fill" style="width: 53%; background-color: var(--accent-amber);"></div>
       </div>
 
-      <!-- Calendar Header & Last Borrowed Status Pill -->
+      <!-- AI-Style Rule-Based Advisory Banner -->
+      <div id="advisory-banner" class="advisory-banner advisory-watch">
+        <span id="advisory-icon">🟡</span>
+        <span id="advisory-text">Malapit na sa limit. Paalalahanan na mag-partial payment.</span>
+      </div>
+
+      <!-- 1-Tap "Kasunduan" SMS / Copy Summary Generator -->
+      <button id="btn-kasunduan" class="btn-kasunduan touch-target">
+        <span>📜</span> I-send ang Kasunduan (SMS / Copy)
+      </button>
+    </section>
+
+    <!-- 4. Interactive Mini Debt Calendar (Presbyopia Accessible) -->
+    <section class="calendar-container">
       <div class="calendar-header-row">
-        <div class="cal-month-title">
-          <button id="cal-prev-btn" class="cal-nav-btn touch-target">◀</button>
-          <span id="cal-month-label">Oktubre 2026</span>
-          <button id="cal-next-btn" class="cal-nav-btn touch-target">▶</button>
+        <div class="cal-title-block">
+          <button id="btn-cal-prev" class="cal-nav-btn touch-target">◀</button>
+          <span id="cal-month-title">Oktubre 2026</span>
+          <button id="btn-cal-next" class="cal-nav-btn touch-target">▶</button>
         </div>
-        <div id="last-borrowed-pill" class="last-borrowed-pill">Last borrowed: 3 days ago</div>
+        <div id="pill-last-utang" class="last-utang-pill">Huling utang: 3 days ago</div>
       </div>
 
-      <!-- Weekday Headers -->
       <div class="cal-weekdays">
         <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
       </div>
 
-      <!-- Interactive Calendar Grid -->
       <div class="cal-grid" id="calendar-grid">
-        <!-- Injected via JS -->
+        <!-- 7-Column grid with 9px indicator dots rendered via JS -->
       </div>
 
-      <!-- Tap-to-Inspect Card -->
-      <div class="cal-inspect-card" id="cal-inspect-card">
-        <div class="inspect-date-title">
-          <span id="inspect-date-header">📅 Oktubre 15, 2026</span>
-          <span style="font-size: 10px; color: var(--accent-green); font-weight: 700;">Tap marked date to inspect</span>
+      <!-- Date Details Popover -->
+      <div class="cal-inspect-popover" id="cal-inspect-popover">
+        <div class="inspect-header">
+          <span id="inspect-date-header">📅 Oktubre 18, 2026</span>
+          <span style="font-size: 10px; color: var(--accent-green); font-weight: 800;">Tap date to view</span>
         </div>
         <div id="inspect-content-list">
-          <!-- Injected via JS -->
+          <!-- Populated via JS -->
         </div>
       </div>
     </section>
 
-    <!-- One-Tap Staple Speed Board -->
-    <section class="speed-board-section">
-      <div class="section-header-title">
-        <span>⚡ 1-Tap Staple Speed Board</span>
-        <span style="font-size: 10px; color: var(--accent-green); font-weight: 700;">Tap item to add</span>
-      </div>
-      <div class="product-grid" id="product-grid">
-        <!-- Rendered via JS -->
-      </div>
-    </section>
+    <!-- Lower 60% Thumb Zone -->
+    <div class="thumb-zone">
 
-    <!-- Action Bar & Quick Repayments -->
-    <section class="action-panel">
+      <!-- 5. Micro-Credit "Tingi" Bar -->
+      <section class="tingi-bar-section">
+        <div class="section-headline">
+          <span>⚡ Bilis-Tingi (Unlisted Micro-Credit)</span>
+          <span style="font-size: 10px; color: var(--accent-green);">1-Tap Add</span>
+        </div>
+        <div class="tingi-pill-row">
+          <button class="tingi-pill touch-target btn-tingi-action" data-tingi="5">+₱5</button>
+          <button class="tingi-pill touch-target btn-tingi-action" data-tingi="10">+₱10</button>
+          <button class="tingi-pill touch-target btn-tingi-action" data-tingi="20">+₱20</button>
+          <button class="tingi-pill touch-target btn-tingi-action" data-tingi="50">+₱50</button>
+        </div>
+      </section>
 
-      <!-- Running Basket Total Card -->
-      <div class="basket-bar-card">
-        <div class="basket-top-row">
+      <!-- 6. Staple Speed Board Grid -->
+      <section>
+        <div class="section-headline" style="margin-bottom: 6px;">
+          <span>📦 Pangunahing Paninda</span>
+          <span style="font-size: 10px; color: var(--accent-green);">8 Staple Tiles</span>
+        </div>
+        <div class="speed-board-grid" id="speed-board-grid">
+          <!-- Rendered via JS -->
+        </div>
+      </section>
+
+      <!-- 7. Action Drawer / Sticky Counter Bar -->
+      <section class="basket-counter-card">
+        <div class="basket-header-row">
           <div>
-            <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--accent-green);">Basket: </span>
+            <span style="font-size: 11px; font-weight: 900; text-transform: uppercase; color: var(--accent-green);">Basket: </span>
             <span id="basket-items-preview" class="basket-items-preview">Pumili ng paninda</span>
           </div>
-          <button id="clear-basket-btn" style="background: transparent; border: none; color: var(--text-muted); font-size: 11px; cursor: pointer; text-decoration: underline;">Clear</button>
+          <button id="btn-clear-basket" class="btn-clear-basket">I-clear</button>
         </div>
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">Kabuuang Halaga:</span>
-          <span id="basket-total-text" class="basket-total-text">₱0</span>
+        <div class="basket-total-row">
+          <span class="basket-total-label">Dagdag Utang:</span>
+          <span id="basket-total-amount" class="basket-total-amount">₱0.00</span>
         </div>
         <button id="btn-ilista" class="btn-ilista touch-target" disabled>
-          <span>✍️</span> Ilista ang Utang (₱0)
+          <span>✍️</span> ILISTA (UTANG) ₱0.00
         </button>
-      </div>
+      </section>
 
-      <!-- Quick Pay Row -->
-      <div class="quick-pay-wrap">
-        <div class="quick-pay-label">
+      <!-- 8. Quick Repayment Row -->
+      <section class="quick-pay-card">
+        <div class="section-headline">
           <span>💵 Mabilis na Bayad (Quick Pay)</span>
-          <span style="font-size: 10px;">1-Tap bawas utang</span>
+          <span style="font-size: 10px;">Bawas Utang</span>
         </div>
         <div class="pay-chips-grid">
-          <button class="pay-chip touch-target" data-pay="20">₱20</button>
-          <button class="pay-chip touch-target" data-pay="50">₱50</button>
-          <button class="pay-chip touch-target" data-pay="100">₱100</button>
-          <button class="pay-chip touch-target" data-pay="500">₱500</button>
-          <button class="pay-chip full-pay touch-target" id="pay-full-chip">Bayad Lahat</button>
+          <button class="pay-chip touch-target btn-quick-pay" data-pay="20">₱20</button>
+          <button class="pay-chip touch-target btn-quick-pay" data-pay="50">₱50</button>
+          <button class="pay-chip touch-target btn-quick-pay" data-pay="100">₱100</button>
+          <button class="pay-chip touch-target btn-quick-pay" data-pay="500">₱500</button>
+          <button class="pay-chip full-pay touch-target btn-quick-pay" data-pay="FULL" id="btn-pay-full">Bayad<br>Lahat</button>
         </div>
-      </div>
+      </section>
 
-    </section>
-
-    <!-- Recent Activity Timeline -->
-    <section class="timeline-section">
-      <div class="timeline-card">
-        <div class="section-header-title">
-          <span>🕒 Kamakailang Transaksyon</span>
-          <span style="font-size: 10px;">Huling 3 tala</span>
+      <!-- 9. Recent Activity Drawer -->
+      <section class="timeline-card">
+        <div class="section-headline">
+          <span>🕒 Kamakailang Talaan</span>
+          <span style="font-size: 10px;">Huling 4 na transaksyon</span>
         </div>
         <div class="timeline-list" id="timeline-list">
           <!-- Rendered via JS -->
         </div>
+      </section>
+
+    </div>
+
+    <!-- 10. Full-Screen Sukli (Change) Modal (Bug 1.3 Resolution) -->
+    <div id="sukli-modal-backdrop" class="modal-backdrop">
+      <div class="sukli-modal-card">
+        <div class="sukli-header-title">💵 Sukli Calculator</div>
+        <div class="sukli-cust-name" id="modal-sukli-cust">Aling Nena</div>
+        <div>
+          <span style="font-size: 13px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Ibalik na Sukli:</span>
+          <div class="sukli-giant-amount" id="modal-sukli-amount">₱65.00</div>
+        </div>
+        <div class="sukli-detail-row">
+          <span>Inabot na Pera:</span>
+          <span id="modal-tendered-amount" style="color: var(--text-primary);">₱100.00</span>
+        </div>
+        <div class="sukli-detail-row">
+          <span>Ibinawas sa Utang:</span>
+          <span id="modal-cleared-amount" style="color: var(--accent-green);">₱35.00</span>
+        </div>
+        <button id="btn-dismiss-sukli" class="btn-dismiss-sukli touch-target">
+          OK, NAABOT NA
+        </button>
       </div>
-    </section>
+    </div>
 
   </div>
 
   <script>
     /**
-     * SariSync Visual Credit & Repayment Speed Board
-     * Self-contained prototype with Dark/Light mode, interactive calendar, and Web Audio
+     * SariSync Speed Board - Production-Ready Digital Credit Ledger
+     * Fully self-contained, native web standards, zero dependencies
      */
 
-    // Initial Mock Customers with past October 2026 transactions
-    const initialCustomers = [
-      {
-        id: "c1",
-        name: "Aling Nena",
-        avatar: "👵",
-        phone: "0917-123-4567",
-        totalDebt: 320,
-        creditLimit: 600,
-        history: [
-          { id: "tx1", type: "utang", amount: 150, items: "2x Coffee, 1x Noodles", date: "2026-10-15" },
-          { id: "tx2", type: "payment", amount: 50, date: "2026-10-16" },
-          { id: "tx3", type: "utang", amount: 220, items: "Rice 1kg, Sardines, Bread", date: "2026-10-12" }
-        ]
+    // 2. State Management & Exact Seed Schema
+    const defaultState = {
+      theme: "dark",
+      selectedCustomerId: "c1",
+      activeBasket: {
+        items: {}, // key: productId or tingiId, value: quantity
+        total: 0
       },
-      {
-        id: "c2",
-        name: "Mang Boy",
-        avatar: "👨",
-        phone: "0928-555-8899",
-        totalDebt: 850,
-        creditLimit: 800,
-        history: [
-          { id: "tx4", type: "utang", amount: 850, items: "Rice (5kg), Canned Goods", date: "2026-10-04" }
-        ]
-      },
-      {
-        id: "c3",
-        name: "Ate Joy",
-        avatar: "👩",
-        phone: "0919-888-2233",
-        totalDebt: 120,
-        creditLimit: 400,
-        history: [
-          { id: "tx5", type: "utang", amount: 120, items: "Shampoo, Eggs, Cooking Oil", date: "2026-10-17" },
-          { id: "tx6", type: "payment", amount: 100, date: "2026-10-10" },
-          { id: "tx7", type: "utang", amount: 100, items: "Coffee, Bread", date: "2026-10-08" }
-        ]
-      }
-    ];
+      customers: [
+        {
+          id: "c1",
+          name: "Aling Nena",
+          phone: "0917-123-4567",
+          totalDebt: 320.00,
+          creditLimit: 600.00,
+          daysOverdue: 2,
+          repaymentRate: 92,
+          history: [
+            { id: "tx_101", type: "utang", amount: 150.00, items: "2x 3-in-1 Coffee, 1x Sardines", date: "2026-10-15" },
+            { id: "tx_102", type: "payment", amount: 100.00, tendered: 100.00, sukli: 0.00, date: "2026-10-16" },
+            { id: "tx_103", type: "utang", amount: 270.00, items: "1x Rice (1kg), 1x Corned Beef", date: "2026-10-18" }
+          ]
+        },
+        {
+          id: "c2",
+          name: "Mang Boy",
+          phone: "0928-555-8899",
+          totalDebt: 850.00,
+          creditLimit: 800.00,
+          daysOverdue: 14,
+          repaymentRate: 38,
+          history: [
+            { id: "tx_201", type: "utang", amount: 850.00, items: "5kg Rice, 4x Noodles, Mantika", date: "2026-10-04" }
+          ]
+        },
+        {
+          id: "c3",
+          name: "Ate Joy",
+          phone: "0919-888-2233",
+          totalDebt: 95.00,
+          creditLimit: 500.00,
+          daysOverdue: 0,
+          repaymentRate: 96,
+          history: [
+            { id: "tx_301", type: "utang", amount: 95.00, items: "Eggs, Pan de Sal, Shampoo", date: "2026-10-17" }
+          ]
+        }
+      ],
+      stapleProducts: [
+        { id: "p1", name: "3-in-1 Coffee", price: 15.00, emoji: "☕" },
+        { id: "p2", name: "Instant Mami", price: 18.00, emoji: "🍜" },
+        { id: "p3", name: "Canned Sardines", price: 28.00, emoji: "🐟" },
+        { id: "p4", name: "Fresh Egg", price: 10.00, emoji: "🥚" },
+        { id: "p5", name: "Rice (1kg)", price: 52.00, emoji: "🍚" },
+        { id: "p6", name: "Shampoo Sachet", price: 8.00, emoji: "🧴" },
+        { id: "p7", name: "Cooking Oil (Tingi)", price: 20.00, emoji: "🫗" },
+        { id: "p8", name: "Pan de Sal (4pcs)", price: 20.00, emoji: "🥖" }
+      ]
+    };
 
-    // 8 Staple Speed Board Products
-    const stapleProducts = [
-      { id: "p1", name: "Coffee", price: 15, emoji: "☕" },
-      { id: "p2", name: "Noodles", price: 18, emoji: "🍜" },
-      { id: "p3", name: "Sardines", price: 28, emoji: "🐟" },
-      { id: "p4", name: "Egg", price: 10, emoji: "🥚" },
-      { id: "p5", name: "Rice 1kg", price: 52, emoji: "🍚" },
-      { id: "p6", name: "Shampoo", price: 8, emoji: "🧴" },
-      { id: "p7", name: "Cooking Oil", price: 20, emoji: "🫗" },
-      { id: "p8", name: "Bread", price: 20, emoji: "🥖" }
-    ];
-
-    // Application State
-    let customers = [];
-    let selectedCustomerId = "c1";
-    let activeBasket = {}; // { [productId]: quantity }
+    // Live State
+    let appState = {};
     let soundEnabled = true;
-    let currentTheme = "dark";
 
-    // Calendar State
-    let currentCalDate = new Date(2026, 9, 1); // October 2026 (Month 9 is October)
-    let selectedInspectedDate = "2026-10-18"; // Default selected date (today)
+    // Calendar Navigation State
+    let currentCalDate = new Date(2026, 9, 1); // Month 9 = October
+    let selectedInspectedDate = "2026-10-18";
 
-    // Web Audio Synthesizer
+    // 3.1 Date Progress Fallback Logic
+    function getTodayIso() {
+      const now = new Date();
+      const y = now.getFullYear();
+      if (y > 2026 || (y === 2026 && now.getMonth() >= 9)) {
+        const m = String(now.getMonth() + 1).padStart(2, "0");
+        const d = String(now.getDate()).padStart(2, "0");
+        return `${y}-${m}-${d}`;
+      }
+      return "2026-10-18";
+    }
+
+    function parseIsoDate(isoStr) {
+      const [y, m, d] = isoStr.split("-").map(Number);
+      return new Date(y, m - 1, d);
+    }
+
+    function calculateDaysAgo(dateStr) {
+      const today = parseIsoDate(getTodayIso());
+      const past = parseIsoDate(dateStr);
+      const diffMs = today.getTime() - past.getTime();
+      return Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
+    }
+
+    // Defensive Math Rounding Helper
+    function round2(val) {
+      return Number(Number(val).toFixed(2));
+    }
+
+    // 3.2 Anti-Rapid-Tap Debounce Guard (Bug 1.1 Resolution)
+    let isActionLocked = false;
+    function withActionLock(fn, cooldown = 400) {
+      return function(...args) {
+        if (isActionLocked) return;
+        isActionLocked = true;
+        try {
+          fn(...args);
+        } catch (e) {
+          console.error("Action error:", e);
+        } finally {
+          setTimeout(() => { isActionLocked = false; }, cooldown);
+        }
+      };
+    }
+
+    // Web Audio Synthesizer (Native tactile sound)
     let audioCtx = null;
     function getAudioContext() {
       if (!audioCtx) {
@@ -1132,15 +1438,15 @@
 
         if (type === 'tap') {
           osc.type = 'triangle';
-          osc.frequency.setValueAtTime(420, now);
-          osc.frequency.exponentialRampToValueAtTime(840, now + 0.04);
+          osc.frequency.setValueAtTime(440, now);
+          osc.frequency.exponentialRampToValueAtTime(880, now + 0.04);
           gain.gain.setValueAtTime(0.2, now);
           gain.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
           osc.start(now);
           osc.stop(now + 0.04);
         } else if (type === 'cash') {
           osc.type = 'sine';
-          osc.frequency.setValueAtTime(987, now);
+          osc.frequency.setValueAtTime(987.77, now);
           gain.gain.setValueAtTime(0.25, now);
           gain.gain.exponentialRampToValueAtTime(0.01, now + 0.22);
           osc.start(now);
@@ -1151,7 +1457,7 @@
           osc2.connect(gain2);
           gain2.connect(ctx.destination);
           osc2.type = 'sine';
-          osc2.frequency.setValueAtTime(1318, now + 0.08);
+          osc2.frequency.setValueAtTime(1318.51, now + 0.08);
           gain2.gain.setValueAtTime(0.3, now + 0.08);
           gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
           osc2.start(now + 0.08);
@@ -1174,369 +1480,346 @@
           osc.stop(now + 0.2);
         }
       } catch (e) {
-        console.warn("Audio feedback error", e);
+        console.warn("Audio feedback error:", e);
       }
     }
 
-    // Theme Management
-    function initTheme() {
-      const savedTheme = localStorage.getItem("sarisync_theme");
-      if (savedTheme === "light" || savedTheme === "dark") {
-        currentTheme = savedTheme;
-      } else {
-        currentTheme = "dark";
-      }
-      applyTheme(currentTheme);
-    }
-
-    function applyTheme(theme) {
-      document.documentElement.setAttribute("data-theme", theme);
-      const btn = document.getElementById("theme-toggle-btn");
-      if (btn) {
-        // When in dark mode, button icon is Sun ☀️ (tap for light); when in light mode, button icon is Moon 🌙 (tap for dark)
-        btn.textContent = theme === "dark" ? "☀️" : "🌙";
-        btn.setAttribute("title", theme === "dark" ? "Lumipat sa Sunlight / Light Mode" : "Lumipat sa Dark Mode");
-      }
-      localStorage.setItem("sarisync_theme", theme);
-    }
-
-    function toggleTheme() {
-      playSound('tap');
-      currentTheme = currentTheme === "dark" ? "light" : "dark";
-      applyTheme(currentTheme);
-      showToast(currentTheme === "light" ? "Naka-activate ang Sunlight Mode! ☀️" : "Naka-activate ang Dark Mode! 🌙");
-    }
-
-    // Toast Notification
-    function showToast(message, type = false) {
-      const anchor = document.getElementById("toast-anchor");
-      if (!anchor) return;
-      const isAlert = type === true || type === "warning" || type === "alert" || type === "danger";
+    // Toast Notification System
+    function showToast(message, type = "success") {
+      const container = document.getElementById("toast-container");
+      if (!container) return;
+      const isAlert = type === "warning" || type === "alert" || type === "danger" || type === true;
       const icon = isAlert ? "⚠️" : (type === "info" ? "ℹ️" : "✅");
       const toast = document.createElement("div");
       toast.className = `toast-box ${isAlert ? "toast-alert" : ""}`;
       toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
-      anchor.appendChild(toast);
+      container.appendChild(toast);
       setTimeout(() => {
         toast.style.opacity = "0";
         toast.style.transition = "opacity 0.25s ease";
         setTimeout(() => toast.remove(), 250);
-      }, 2400);
+      }, 2500);
     }
 
-    // LocalStorage Initialization & Persistence
-    function initData() {
-      const stored = localStorage.getItem("sarisync_speedboard_data");
+    // State Persistence
+    function loadState() {
+      const stored = localStorage.getItem("sarisync_speedboard_v2");
       if (stored) {
         try {
-          customers = JSON.parse(stored);
+          appState = JSON.parse(stored);
         } catch (e) {
-          customers = JSON.parse(JSON.stringify(initialCustomers));
-          saveData();
+          appState = JSON.parse(JSON.stringify(defaultState));
+          saveState();
         }
       } else {
-        customers = JSON.parse(JSON.stringify(initialCustomers));
-        saveData();
+        appState = JSON.parse(JSON.stringify(defaultState));
+        saveState();
       }
 
-      if (!customers.find(c => c.id === selectedCustomerId) && customers.length > 0) {
-        selectedCustomerId = customers[0].id;
+      if (!appState.customers.find(c => c.id === appState.selectedCustomerId) && appState.customers.length > 0) {
+        appState.selectedCustomerId = appState.customers[0].id;
+      }
+      if (!appState.activeBasket) {
+        appState.activeBasket = { items: {}, total: 0 };
       }
     }
 
-    function saveData() {
-      localStorage.setItem("sarisync_speedboard_data", JSON.stringify(customers));
+    function saveState() {
+      localStorage.setItem("sarisync_speedboard_v2", JSON.stringify(appState));
     }
 
-    function resetData() {
-      if (confirm("I-reset ang lahat ng data sa panimulang talaan?")) {
-        customers = JSON.parse(JSON.stringify(initialCustomers));
-        selectedCustomerId = "c1";
-        activeBasket = {};
+    function resetToFactorySeed() {
+      if (confirm("I-reset ang SariSync sa orihinal na talaan (Aling Nena, Mang Boy, Ate Joy)?")) {
+        appState = JSON.parse(JSON.stringify(defaultState));
         currentCalDate = new Date(2026, 9, 1);
         selectedInspectedDate = "2026-10-18";
-        saveData();
+        saveState();
+        applyTheme(appState.theme || "dark");
         renderAll();
-        showToast("Na-reset ang SariSync sa mock data!");
+        showToast("Na-reset ang SariSync sa seed data!");
       }
     }
 
     function getSelectedCustomer() {
-      return customers.find(c => c.id === selectedCustomerId) || customers[0];
+      return appState.customers.find(c => c.id === appState.selectedCustomerId) || appState.customers[0];
     }
 
-    // Date Utilities
-    function parseIsoDate(isoStr) {
-      const [y, m, d] = isoStr.split("-").map(Number);
-      return new Date(y, m - 1, d);
-    }
-
-    function getTodayIso() {
-      return "2026-10-18";
-    }
-
-    function calculateDaysAgo(dateStr) {
-      const today = parseIsoDate(getTodayIso());
-      const past = parseIsoDate(dateStr);
-      const diffMs = today.getTime() - past.getTime();
-      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-      return Math.max(0, diffDays);
-    }
-
-    // Customer Status (Traffic Light)
-    function getCustomerStatus(cust) {
-      if (cust.totalDebt > cust.creditLimit) {
-        return { color: "dot-red", status: "red" };
+    // Theme Management
+    function applyTheme(theme) {
+      appState.theme = theme;
+      document.documentElement.setAttribute("data-theme", theme);
+      const btn = document.getElementById("btn-theme-toggle");
+      if (btn) {
+        btn.textContent = theme === "dark" ? "☀️" : "🌙";
+        btn.setAttribute("title", theme === "dark" ? "Lumipat sa Sunlight / Light Mode" : "Lumipat sa Dark Mode");
       }
-      if (cust.totalDebt >= cust.creditLimit * 0.7) {
-        return { color: "dot-yellow", status: "yellow" };
-      }
-      return { color: "dot-green", status: "green" };
+      saveState();
     }
 
-    // Basket Operations
+    function toggleTheme() {
+      playSound('tap');
+      const newTheme = appState.theme === "dark" ? "light" : "dark";
+      applyTheme(newTheme);
+      showToast(newTheme === "light" ? "Naka-activate ang Sunlight Mode! ☀️" : "Naka-activate ang Dark Mode! 🌙");
+    }
+
+    // 3.3 Dynamic "Tingi" Micro-Amount Injector & Product Basket Operations
     function addProductToBasket(prodId) {
       playSound('tap');
-      if (!activeBasket[prodId]) {
-        activeBasket[prodId] = 0;
+      if (!appState.activeBasket.items[prodId]) {
+        appState.activeBasket.items[prodId] = 0;
       }
-      activeBasket[prodId] += 1;
+      appState.activeBasket.items[prodId] += 1;
+      computeBasketTotal();
       renderBasket();
-      renderProductGrid();
+      renderSpeedBoard();
+    }
+
+    function addTingiToBasket(amount) {
+      playSound('tap');
+      const tingiId = `tingi_${amount}`;
+      if (!appState.activeBasket.items[tingiId]) {
+        appState.activeBasket.items[tingiId] = 0;
+      }
+      appState.activeBasket.items[tingiId] += 1;
+      computeBasketTotal();
+      renderBasket();
+      renderSpeedBoard();
+      showToast(`+₱${amount} Tingi idinagdag sa basket!`);
+    }
+
+    function computeBasketTotal() {
+      let sum = 0;
+      for (const [id, qty] of Object.entries(appState.activeBasket.items)) {
+        if (id.startsWith("tingi_")) {
+          const val = Number(id.replace("tingi_", ""));
+          sum += val * qty;
+        } else {
+          const prod = appState.stapleProducts.find(p => p.id === id);
+          if (prod) sum += prod.price * qty;
+        }
+      }
+      appState.activeBasket.total = round2(sum);
     }
 
     function clearBasket() {
       playSound('tap');
-      activeBasket = {};
+      appState.activeBasket = { items: {}, total: 0 };
       renderBasket();
-      renderProductGrid();
-    }
-
-    function getBasketTotal() {
-      let total = 0;
-      for (const [id, qty] of Object.entries(activeBasket)) {
-        const prod = stapleProducts.find(p => p.id === id);
-        if (prod) total += prod.price * qty;
-      }
-      return total;
+      renderSpeedBoard();
     }
 
     function getBasketSummaryText() {
-      const items = [];
-      for (const [id, qty] of Object.entries(activeBasket)) {
-        const prod = stapleProducts.find(p => p.id === id);
-        if (prod && qty > 0) {
-          items.push(`${qty}x ${prod.name}`);
-        }
-      }
-      return items.length > 0 ? items.join(", ") : "Pumili ng paninda";
-    }
-
-    // Current Basket helper bridge for seamless compatibility
-    Object.defineProperty(window, "currentBasket", {
-      get() {
-        return {
-          total: getBasketTotal(),
-          summaryText: getBasketSummaryText(),
-          items: activeBasket
-        };
-      }
-    });
-
-    function resetBasket() {
-      activeBasket = {};
-      renderBasket();
-      renderProductGrid();
-    }
-
-    function saveToLocalStorage() {
-      saveData();
-    }
-
-    // State flag to prevent concurrent execution
-    let isProcessingTransaction = false;
-
-    /**
-     * Helper to lock action buttons temporarily
-     * Prevents rapid double-taps and wet/sticky finger spam
-     */
-    function withButtonLock(buttonElement, actionFn, cooldownMs = 450) {
-      if (isProcessingTransaction) return;
-
-      isProcessingTransaction = true;
-      
-      // Visual tactile feedback: disable button and dim slightly
-      if (buttonElement) {
-        buttonElement.disabled = true;
-        buttonElement.style.opacity = "0.6";
-        buttonElement.style.pointerEvents = "none";
-      }
-
-      try {
-        actionFn();
-      } catch (err) {
-        console.error("Transaction error:", err);
-      } finally {
-        // Release lock after cooldown
-        setTimeout(() => {
-          isProcessingTransaction = false;
-          if (buttonElement) {
-            buttonElement.disabled = false;
-            buttonElement.style.opacity = "1";
-            buttonElement.style.pointerEvents = "auto";
-          }
-        }, cooldownMs);
-      }
-    }
-
-    /**
-     * Patched submitDebt with synchronous lock
-     */
-    function submitDebt(event) {
-      const triggerBtn = event?.currentTarget || document.getElementById("btn-ilista") || document.getElementById("ilista-btn");
-
-      withButtonLock(triggerBtn, () => {
-        // 1. Validation check: Ensure basket has items
-        if (!currentBasket || currentBasket.total <= 0) {
-          showToast("Pumili muna ng paninda sa speed board!", "warning");
-          return;
-        }
-
-        if (!selectedCustomerId) {
-          showToast("Pumili muna ng suki!", "warning");
-          return;
-        }
-
-        // 2. Perform the update
-        const customer = customers.find(c => c.id === selectedCustomerId);
-        if (!customer) return;
-
-        const addedAmount = Number(currentBasket.total.toFixed(2));
-        customer.totalDebt = Number((customer.totalDebt + addedAmount).toFixed(2));
-
-        // 3. Append transaction record
-        const todayStr = new Date().toISOString().split("T")[0];
-        customer.history.unshift({
-          id: "tx_" + Date.now(),
-          type: "utang",
-          amount: addedAmount,
-          items: currentBasket.summaryText || "Staple items",
-          date: todayStr
-        });
-
-        // Tactile audio & calendar date selection
-        if (customer.totalDebt > customer.creditLimit) {
-          playSound('alert');
+      const parts = [];
+      for (const [id, qty] of Object.entries(appState.activeBasket.items)) {
+        if (qty <= 0) continue;
+        if (id.startsWith("tingi_")) {
+          const val = id.replace("tingi_", "");
+          parts.push(`${qty}x Tingi (₱${val})`);
         } else {
-          playSound('stamp');
+          const prod = appState.stapleProducts.find(p => p.id === id);
+          if (prod) parts.push(`${qty}x ${prod.name}`);
         }
-        selectedInspectedDate = todayStr;
-
-        // 4. Reset basket & save state
-        resetBasket();
-        saveToLocalStorage();
-        renderAll();
-        
-        showToast(`Nailista: ₱${addedAmount} kay ${customer.name}`, "success");
-      });
+      }
+      return parts.length > 0 ? parts.join(", ") : "Pumili ng paninda";
     }
 
-    /**
-     * Patched handleQuickPay with synchronous lock
-     */
-    function handleQuickPay(amount, event) {
-      const triggerBtn = event?.currentTarget;
+    // Commit Debt (ILISTA)
+    function executeSubmitDebt() {
+      const cust = getSelectedCustomer();
+      if (!cust) return;
+      if (appState.activeBasket.total <= 0) {
+        showToast("Pumili muna ng paninda sa speed board!", "warning");
+        return;
+      }
 
-      withButtonLock(triggerBtn, () => {
-        if (!selectedCustomerId) {
-          showToast("Pumili muna ng suki!", "warning");
-          return;
-        }
+      const addedAmount = round2(appState.activeBasket.total);
+      const isOver = round2(cust.totalDebt + addedAmount) > cust.creditLimit;
 
-        const customer = customers.find(c => c.id === selectedCustomerId);
-        if (!customer) return;
-
-        if (customer.totalDebt <= 0) {
-          showToast("Wala nang natitirang utang!", "info");
-          return;
-        }
-
-        // Determine actual payment deduction (cannot pay more than current debt)
-        let paymentAmount = amount === "FULL" ? customer.totalDebt : Number(amount);
-        if (paymentAmount > customer.totalDebt) {
-          paymentAmount = customer.totalDebt;
-        }
-        paymentAmount = Number(paymentAmount.toFixed(2));
-
-        // Deduct
-        customer.totalDebt = Number((customer.totalDebt - paymentAmount).toFixed(2));
-
-        // Log transaction
-        const todayStr = new Date().toISOString().split("T")[0];
-        customer.history.unshift({
-          id: "tx_" + Date.now(),
-          type: "payment",
-          amount: paymentAmount,
-          date: todayStr
-        });
-
-        // Tactile audio & calendar date selection
-        playSound('cash');
-        selectedInspectedDate = todayStr;
-
-        // Save & update UI
-        saveToLocalStorage();
-        renderAll();
-
-        showToast(`Bayad natanggap: ₱${paymentAmount}`, "success");
-      });
-    }
-
-    // Render Methods
-    function renderTopMetrics() {
-      const totalCollectible = customers.reduce((sum, c) => sum + (c.totalDebt || 0), 0);
-      document.getElementById("metric-total-collectible").textContent = `₱${totalCollectible.toLocaleString()}`;
-
-      document.getElementById("pill-active-accounts").textContent = `${customers.length} Suki`;
-
-      const flaggedCount = customers.filter(c => c.totalDebt > c.creditLimit).length;
-      const flaggedPill = document.getElementById("pill-flagged-accounts");
-      if (flaggedCount > 0) {
-        flaggedPill.style.display = "inline-flex";
-        flaggedPill.textContent = `${flaggedCount} Flagged`;
+      if (isOver) {
+        playSound('alert');
       } else {
-        flaggedPill.style.display = "none";
+        playSound('stamp');
+      }
+
+      const todayStr = getTodayIso();
+      const summary = getBasketSummaryText();
+
+      const newTx = {
+        id: "tx_" + Date.now(),
+        type: "utang",
+        amount: addedAmount,
+        items: summary,
+        date: todayStr
+      };
+
+      cust.totalDebt = round2(cust.totalDebt + addedAmount);
+      if (!cust.history) cust.history = [];
+      cust.history.unshift(newTx);
+
+      appState.activeBasket = { items: {}, total: 0 };
+      selectedInspectedDate = todayStr;
+      saveState();
+      renderAll();
+
+      showToast(`Nailista: ₱${addedAmount.toFixed(2)} kay ${cust.name}!`, isOver ? "warning" : "success");
+    }
+
+    // 3.4 Sukli (Change) Calculator & High-Contrast Modal (Bug 1.3 Resolution)
+    function executeQuickPay(denomination) {
+      const cust = getSelectedCustomer();
+      if (!cust) return;
+      if (cust.totalDebt <= 0) {
+        showToast("Wala nang natitirang utang ang suki!", "info");
+        return;
+      }
+
+      let tendered = 0;
+      if (denomination === "FULL") {
+        tendered = cust.totalDebt;
+      } else {
+        tendered = Number(denomination);
+      }
+      tendered = round2(tendered);
+
+      // Determine actual amount used to clear debt
+      const bawasUtang = round2(Math.min(tendered, cust.totalDebt));
+      const sukli = round2(Math.max(0, tendered - bawasUtang));
+      const todayStr = getTodayIso();
+
+      // Update debt
+      cust.totalDebt = round2(Math.max(0, cust.totalDebt - bawasUtang));
+      if (cust.totalDebt === 0) {
+        cust.daysOverdue = 0;
+      }
+
+      // Append transaction record
+      const newTx = {
+        id: "tx_" + Date.now(),
+        type: "payment",
+        amount: bawasUtang,
+        tendered: tendered,
+        sukli: sukli,
+        date: todayStr
+      };
+      if (!cust.history) cust.history = [];
+      cust.history.unshift(newTx);
+
+      selectedInspectedDate = todayStr;
+      saveState();
+      playSound('cash');
+      renderAll();
+
+      if (sukli > 0) {
+        // Show Full-Screen Sukli Modal
+        displaySukliModal(cust.name, tendered, bawasUtang, sukli);
+      } else {
+        showToast(`Bayad natanggap: ₱${bawasUtang.toFixed(2)} kay ${cust.name}!`);
       }
     }
 
-    function renderCustomerChips() {
-      const container = document.getElementById("customer-chips-container");
+    function displaySukliModal(custName, tendered, bawasUtang, sukli) {
+      document.getElementById("modal-sukli-cust").textContent = custName;
+      document.getElementById("modal-sukli-amount").textContent = `₱${sukli.toFixed(2)}`;
+      document.getElementById("modal-tendered-amount").textContent = `₱${tendered.toFixed(2)}`;
+      document.getElementById("modal-cleared-amount").textContent = `₱${bawasUtang.toFixed(2)}`;
+      document.getElementById("sukli-modal-backdrop").classList.add("is-active");
+    }
+
+    function dismissSukliModal() {
+      playSound('tap');
+      document.getElementById("sukli-modal-backdrop").classList.remove("is-active");
+    }
+
+    // 3.6 1-Tap "Kasunduan" SMS / Copy Summary Generator
+    function generateKasunduanText(cust) {
+      const lastTx = (cust.history && cust.history[0]) 
+        ? `${cust.history[0].type.toUpperCase()}: ₱${cust.history[0].amount.toFixed(2)} (${cust.history[0].items || cust.history[0].date})`
+        : "Wala";
+
+      return `Magandang araw po ${cust.name}! Paalala lamang po mula sa aming tindahan, ang inyong kasalukuyang utang balance ay ₱${cust.totalDebt.toFixed(2)} (Limit: ₱${cust.creditLimit.toFixed(2)}). Huling tala: ${lastTx}. Maraming salamat po sa inyong suporta at tiwala sa ating munting tindahan! 🙏`;
+    }
+
+    function sendKasunduan() {
+      const cust = getSelectedCustomer();
+      if (!cust) return;
+      playSound('tap');
+      const text = generateKasunduanText(cust);
+      
+      // Clipboard Copy
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).catch(() => {});
+      }
+
+      showToast("Nakopya sa clipboard ang Kasunduan!");
+
+      // Native SMS trigger
+      const cleanPhone = cust.phone.replace(/[^0-9]/g, "");
+      const encoded = encodeURIComponent(text);
+      setTimeout(() => {
+        window.location.href = `sms:${cleanPhone}?body=${encoded}`;
+      }, 350);
+    }
+
+    // Traffic Light Status Logic
+    function getCustomerStatus(cust) {
+      if (cust.totalDebt > cust.creditLimit) {
+        return { dotClass: "dot-danger", type: "danger", label: "Over limit" };
+      }
+      if (cust.totalDebt >= (cust.creditLimit * 0.7)) {
+        return { dotClass: "dot-watch", type: "watch", label: "Bantayan" };
+      }
+      return { dotClass: "dot-safe", type: "safe", label: "Safe" };
+    }
+
+    // Rendering Engine
+    function renderMetrics() {
+      const totalDebt = appState.customers.reduce((sum, c) => sum + (c.totalDebt || 0), 0);
+      document.getElementById("metric-total-debt").textContent = `₱${totalDebt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+      document.getElementById("badge-total-accounts").textContent = `${appState.customers.length} Suki`;
+
+      const flagged = appState.customers.filter(c => c.totalDebt > c.creditLimit).length;
+      const flaggedBadge = document.getElementById("badge-flagged-accounts");
+      if (flagged > 0) {
+        flaggedBadge.style.display = "inline-flex";
+        flaggedBadge.textContent = `${flagged} Flagged (Over)`;
+      } else {
+        flaggedBadge.style.display = "none";
+      }
+    }
+
+    function renderCustomerRibbon() {
+      const container = document.getElementById("customer-chips-row");
       container.innerHTML = "";
 
-      customers.forEach(cust => {
-        const isSelected = cust.id === selectedCustomerId;
+      appState.customers.forEach(cust => {
+        const isSelected = cust.id === appState.selectedCustomerId;
         const status = getCustomerStatus(cust);
 
         const chip = document.createElement("div");
-        chip.className = `customer-chip touch-target ${isSelected ? "active" : ""} ${status.status === "red" ? "alert-state" : ""}`;
+        chip.className = `customer-chip touch-target ${isSelected ? "active" : ""} ${status.type === "danger" ? "alert-state" : ""}`;
+
+        const avatar = cust.name.includes("Nena") ? "👵" : (cust.name.includes("Boy") ? "👨" : "👩");
 
         chip.innerHTML = `
-          <span class="chip-avatar">${cust.avatar || "👤"}</span>
-          <div class="chip-content">
+          <span class="chip-avatar">${avatar}</span>
+          <div class="chip-meta">
             <div class="chip-name-row">
               <span class="chip-name">${cust.name}</span>
-              <span class="status-dot ${status.color}"></span>
+              <span class="traffic-dot ${status.dotClass}" title="${status.label}"></span>
             </div>
-            <div class="chip-debt-text" style="color: ${status.status === 'red' ? 'var(--alert-red)' : status.status === 'yellow' ? 'var(--caution-amber)' : 'var(--text-primary)'}">
-              ₱${cust.totalDebt.toLocaleString()}
+            <div class="chip-debt-text" style="color: ${status.type === 'danger' ? 'var(--accent-rose)' : status.type === 'watch' ? 'var(--accent-amber)' : 'var(--text-primary)'}">
+              ₱${cust.totalDebt.toFixed(2)}
             </div>
           </div>
         `;
 
         chip.addEventListener("click", () => {
-          if (selectedCustomerId !== cust.id) {
+          if (appState.selectedCustomerId !== cust.id) {
             playSound('tap');
-            selectedCustomerId = cust.id;
+            appState.selectedCustomerId = cust.id;
+            saveState();
             renderAll();
           }
         });
@@ -1545,50 +1828,68 @@
       });
     }
 
-    function renderActiveCustomer() {
+    function renderCustomerProfile() {
       const cust = getSelectedCustomer();
       if (!cust) return;
 
-      document.getElementById("active-cust-avatar").textContent = cust.avatar || "👤";
-      document.getElementById("active-cust-name").textContent = cust.name;
-      document.getElementById("active-cust-phone").textContent = cust.phone;
-
-      const debtEl = document.getElementById("active-cust-debt");
-      debtEl.textContent = `₱${cust.totalDebt.toLocaleString()}`;
-      document.getElementById("active-cust-limit").textContent = `Limit: ₱${cust.creditLimit.toLocaleString()}`;
+      document.getElementById("prof-cust-name").textContent = cust.name;
+      document.getElementById("prof-cust-phone").textContent = `📱 ${cust.phone}`;
+      
+      const debtEl = document.getElementById("prof-cust-debt");
+      debtEl.textContent = `₱${cust.totalDebt.toFixed(2)}`;
+      document.getElementById("prof-cust-limit").textContent = `Limit: ₱${cust.creditLimit.toFixed(2)}`;
 
       const status = getCustomerStatus(cust);
-      if (status.status === "red") {
-        debtEl.style.color = "var(--alert-red)";
-      } else if (status.status === "yellow") {
-        debtEl.style.color = "var(--caution-amber)";
+      if (status.type === "danger") {
+        debtEl.style.color = "var(--accent-rose)";
+      } else if (status.type === "watch") {
+        debtEl.style.color = "var(--accent-amber)";
       } else {
         debtEl.style.color = "var(--text-primary)";
       }
 
-      // Progress Meter
-      const percentage = Math.min(100, Math.round((cust.totalDebt / cust.creditLimit) * 100));
-      const meterFill = document.getElementById("credit-meter-fill");
-      meterFill.style.width = `${percentage}%`;
-      meterFill.style.backgroundColor = status.status === "red" ? "var(--alert-red)" : status.status === "yellow" ? "var(--caution-amber)" : "var(--accent-green)";
+      // Credit Progress Bar
+      const percent = Math.min(100, Math.round((cust.totalDebt / cust.creditLimit) * 100));
+      const fillBar = document.getElementById("credit-progress-fill");
+      fillBar.style.width = `${percent}%`;
+      fillBar.style.backgroundColor = status.type === "danger" ? "var(--accent-rose)" : status.type === "watch" ? "var(--accent-amber)" : "var(--accent-green)";
 
-      // Last Borrowed Status Pill
+      // Advisory Banner
+      const banner = document.getElementById("advisory-banner");
+      const icon = document.getElementById("advisory-icon");
+      const text = document.getElementById("advisory-text");
+
+      banner.className = `advisory-banner ${status.type === 'danger' ? 'advisory-danger' : status.type === 'watch' ? 'advisory-watch' : 'advisory-safe'}`;
+
+      if (status.type === "danger") {
+        const excess = round2(cust.totalDebt - cust.creditLimit);
+        icon.textContent = "🚨";
+        text.textContent = `Lagpas na sa limit ng ₱${excess.toFixed(2)}. Maningil muna bago magpa-utang ulit.`;
+      } else if (status.type === "watch") {
+        icon.textContent = "⚠️";
+        text.textContent = `Malapit na sa limit (${percent}% ginamit). Paalalahanan na mag-partial payment.`;
+      } else {
+        icon.textContent = "🟢";
+        text.textContent = `Magandang suki! Maayos ang bayaran (${cust.repaymentRate}% repayment rate).`;
+      }
+
+      // Last Borrowed Pill
       const lastUtang = (cust.history || []).find(h => h.type === "utang");
-      const pill = document.getElementById("last-borrowed-pill");
+      const pill = document.getElementById("pill-last-utang");
       if (lastUtang) {
         const days = calculateDaysAgo(lastUtang.date);
-        pill.textContent = days === 0 ? "Last borrowed: Today" : days === 1 ? "Last borrowed: Yesterday" : `Last borrowed: ${days} days ago`;
+        pill.textContent = days === 0 ? "Huling utang: Ngayong araw" : days === 1 ? "Huling utang: Kahapon" : `Huling utang: ${days} days ago`;
         if (days >= 14) {
-          pill.style.background = "var(--alert-red-bg)";
-          pill.style.color = "var(--alert-red)";
-          pill.style.borderColor = "rgba(239, 68, 68, 0.4)";
+          pill.style.background = "var(--accent-rose-bg)";
+          pill.style.color = "var(--accent-rose)";
+          pill.style.borderColor = "var(--accent-rose)";
         } else {
-          pill.style.background = "var(--card-alt-bg)";
+          pill.style.background = "var(--bg-card-alt)";
           pill.style.color = "var(--text-muted)";
           pill.style.borderColor = "var(--border-color)";
         }
       } else {
-        pill.textContent = "No borrowed credit";
+        pill.textContent = "Walang nakaraang utang";
       }
     }
 
@@ -1604,12 +1905,11 @@
         "Enero", "Pebrero", "Marso", "Abril", "Mayo", "Hunyo",
         "Hulyo", "Agosto", "Setyembre", "Oktubre", "Nobyembre", "Disyembre"
       ];
-      document.getElementById("cal-month-label").textContent = `${monthNames[month]} ${year}`;
+      document.getElementById("cal-month-title").textContent = `${monthNames[month]} ${year}`;
 
       const firstDayIndex = new Date(year, month, 1).getDay();
       const totalDays = new Date(year, month + 1, 0).getDate();
 
-      // Empty padding cells before first day
       for (let i = 0; i < firstDayIndex; i++) {
         const emptyCell = document.createElement("div");
         emptyCell.className = "cal-cell empty";
@@ -1627,30 +1927,29 @@
 
         cell.className = `cal-cell touch-target ${isToday ? "is-today" : ""} ${isSelected ? "is-selected" : ""}`;
 
-        // Transactions on this day
+        // Find transactions on this date
         const dayTxs = history.filter(t => t.date === dateStr);
         const hasUtang = dayTxs.some(t => t.type === "utang");
         const hasPayment = dayTxs.some(t => t.type === "payment");
 
-        let indicatorHtml = `<div class="cal-dots-wrap">`;
+        let markerHtml = `<div class="cal-marker-row">`;
         if (hasUtang && hasPayment) {
-          // Split indicator when both occurred on same day
-          indicatorHtml += `
-            <div class="cal-split-pill" title="Utang at Bayad">
-              <div class="cal-split-left"></div>
-              <div class="cal-split-right"></div>
+          markerHtml += `
+            <div class="cal-split-indicator" title="Utang at Bayad">
+              <div class="split-utang"></div>
+              <div class="split-payment"></div>
             </div>
           `;
         } else if (hasUtang) {
-          indicatorHtml += `<span class="cal-dot cal-dot-utang" title="Utang"></span>`;
+          markerHtml += `<span class="cal-dot cal-dot-utang" title="Utang"></span>`;
         } else if (hasPayment) {
-          indicatorHtml += `<span class="cal-dot cal-dot-payment" title="Bayad"></span>`;
+          markerHtml += `<span class="cal-dot cal-dot-payment" title="Bayad"></span>`;
         }
-        indicatorHtml += `</div>`;
+        markerHtml += `</div>`;
 
         cell.innerHTML = `
-          <span class="cal-day-num">${day}</span>
-          ${indicatorHtml}
+          <span class="cal-day-number">${day}</span>
+          ${markerHtml}
         `;
 
         cell.addEventListener("click", () => {
@@ -1690,178 +1989,188 @@
       dayTxs.forEach(tx => {
         const isUtang = tx.type === "utang";
         const row = document.createElement("div");
-        row.className = "inspect-item-row";
+        row.className = "inspect-row";
         row.innerHTML = `
-          <div class="inspect-item-desc">
+          <div class="inspect-desc">
             ${isUtang ? "🔴 Utang:" : "🟢 Bayad:"} ${tx.items ? tx.items : "Cash payment"}
           </div>
-          <div class="inspect-item-amt" style="color: ${isUtang ? 'var(--alert-red)' : 'var(--accent-green)'}">
-            ${isUtang ? `+₱${tx.amount.toLocaleString()}` : `-₱${tx.amount.toLocaleString()}`}
+          <div class="inspect-amount" style="color: ${isUtang ? 'var(--accent-rose)' : 'var(--accent-green)'}">
+            ${isUtang ? `+₱${tx.amount.toFixed(2)}` : `-₱${tx.amount.toFixed(2)}`}
           </div>
         `;
         container.appendChild(row);
       });
     }
 
-    function renderProductGrid() {
-      const grid = document.getElementById("product-grid");
-      grid.innerHTML = "";
+    function renderSpeedBoard() {
+      const container = document.getElementById("speed-board-grid");
+      container.innerHTML = "";
 
-      stapleProducts.forEach(prod => {
-        const qty = activeBasket[prod.id] || 0;
+      appState.stapleProducts.forEach(prod => {
+        const qty = appState.activeBasket.items[prod.id] || 0;
         const tile = document.createElement("div");
         tile.className = `product-tile touch-target ${qty > 0 ? "in-basket" : ""}`;
 
         tile.innerHTML = `
-          <div class="product-tile-left">
-            <span class="prod-emoji">${prod.emoji}</span>
-            <div class="prod-info">
-              <span class="prod-name">${prod.name}</span>
-              <span class="prod-price">₱${prod.price}</span>
+          <div class="tile-left">
+            <span class="tile-emoji">${prod.emoji}</span>
+            <div class="tile-info">
+              <span class="tile-name">${prod.name}</span>
+              <span class="tile-price">₱${prod.price.toFixed(2)}</span>
             </div>
           </div>
-          ${qty > 0 ? `<span class="prod-badge">+${qty}</span>` : ""}
+          ${qty > 0 ? `<span class="tile-badge">+${qty}</span>` : ""}
         `;
 
         tile.addEventListener("click", () => {
           addProductToBasket(prod.id);
         });
 
-        grid.appendChild(tile);
+        container.appendChild(tile);
       });
     }
 
     function renderBasket() {
       const previewEl = document.getElementById("basket-items-preview");
-      const totalEl = document.getElementById("basket-total-text");
-      const btn = document.getElementById("btn-ilista") || document.getElementById("ilista-btn");
+      const totalEl = document.getElementById("basket-total-amount");
+      const ilistaBtn = document.getElementById("btn-ilista");
 
-      const total = getBasketTotal();
       previewEl.textContent = getBasketSummaryText();
-      totalEl.textContent = `₱${total.toLocaleString()}`;
+      const total = appState.activeBasket.total || 0;
+      totalEl.textContent = `₱${total.toFixed(2)}`;
 
-      if (btn) {
-        if (total > 0) {
-          btn.disabled = false;
-          btn.innerHTML = `<span>✍️</span> Ilista ang Utang (₱${total.toLocaleString()})`;
-        } else {
-          btn.disabled = true;
-          btn.innerHTML = `<span>✍️</span> Ilista ang Utang (₱0)`;
-        }
+      if (total > 0) {
+        ilistaBtn.disabled = false;
+        ilistaBtn.innerHTML = `<span>✍️</span> ILISTA (UTANG) ₱${total.toFixed(2)}`;
+      } else {
+        ilistaBtn.disabled = true;
+        ilistaBtn.innerHTML = `<span>✍️</span> ILISTA (UTANG) ₱0.00`;
       }
     }
 
     function renderQuickPay() {
       const cust = getSelectedCustomer();
-      const fullPayChip = document.getElementById("pay-full-chip");
+      const payFullBtn = document.getElementById("btn-pay-full");
       if (cust && cust.totalDebt > 0) {
-        fullPayChip.innerHTML = `Bayad Lahat<br>₱${cust.totalDebt.toLocaleString()}`;
-        fullPayChip.disabled = false;
+        payFullBtn.innerHTML = `Bayad<br>Lahat`;
+        payFullBtn.disabled = false;
       } else {
-        fullPayChip.innerHTML = `Bayad Lahat<br>₱0`;
-        fullPayChip.disabled = true;
+        payFullBtn.innerHTML = `Bayad<br>Lahat`;
+        payFullBtn.disabled = true;
       }
     }
 
     function renderTimeline() {
       const cust = getSelectedCustomer();
-      const list = document.getElementById("timeline-list");
-      list.innerHTML = "";
+      const container = document.getElementById("timeline-list");
+      container.innerHTML = "";
 
       const history = cust ? (cust.history || []) : [];
-      const recentThree = history.slice(0, 3);
+      const recentFour = history.slice(0, 4);
 
-      if (recentThree.length === 0) {
-        list.innerHTML = `<div class="timeline-empty">Walang nakaraang transaksyon.</div>`;
+      if (recentFour.length === 0) {
+        container.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 12px; padding: 12px 0;">Walang nakaraang talaan.</div>`;
         return;
       }
 
-      recentThree.forEach(tx => {
+      recentFour.forEach(tx => {
         const isUtang = tx.type === "utang";
-        const row = document.createElement("div");
-        row.className = `timeline-row ${isUtang ? "is-utang" : "is-payment"}`;
+        const item = document.createElement("div");
+        item.className = `timeline-item ${isUtang ? "is-utang" : "is-payment"}`;
 
-        row.innerHTML = `
-          <div class="timeline-row-left">
-            <span class="timeline-dot ${isUtang ? 'dot-red' : 'dot-green'}"></span>
-            <div class="timeline-details">
-              <span class="timeline-item-tag">${isUtang ? (tx.items || "Utang") : "Ibinayad"}</span>
+        item.innerHTML = `
+          <div class="timeline-left">
+            <span class="timeline-dot" style="background-color: ${isUtang ? 'var(--accent-rose)' : 'var(--accent-green)'}"></span>
+            <div class="timeline-meta">
+              <span class="timeline-tags">${isUtang ? (tx.items || "Utang") : "Ibinayad"}</span>
               <span class="timeline-date">${tx.date}</span>
             </div>
           </div>
-          <div class="timeline-amt" style="color: ${isUtang ? 'var(--alert-red)' : 'var(--accent-green)'}">
-            ${isUtang ? `+₱${tx.amount.toLocaleString()}` : `-₱${tx.amount.toLocaleString()}`}
+          <div class="timeline-amt" style="color: ${isUtang ? 'var(--accent-rose)' : 'var(--accent-green)'}">
+            ${isUtang ? `+₱${tx.amount.toFixed(2)}` : `-₱${tx.amount.toFixed(2)}`}
           </div>
         `;
 
-        list.appendChild(row);
+        container.appendChild(item);
       });
     }
 
     function renderAll() {
-      renderTopMetrics();
-      renderCustomerChips();
-      renderActiveCustomer();
+      renderMetrics();
+      renderCustomerRibbon();
+      renderCustomerProfile();
       renderCalendar();
-      renderProductGrid();
+      renderSpeedBoard();
       renderBasket();
       renderQuickPay();
       renderTimeline();
     }
 
-    // Event Listeners Setup
+    // Event Listeners Binding (with Action Lock Guards)
     function setupEventListeners() {
-      // Theme Toggle (☀️ / 🌙)
-      document.getElementById("theme-toggle-btn").addEventListener("click", toggleTheme);
+      // Theme Toggle
+      document.getElementById("btn-theme-toggle").addEventListener("click", toggleTheme);
 
       // Sound Toggle
-      const soundBtn = document.getElementById("sound-btn");
+      const soundBtn = document.getElementById("btn-sound-toggle");
       soundBtn.addEventListener("click", () => {
         soundEnabled = !soundEnabled;
         soundBtn.textContent = soundEnabled ? "🔊" : "🔇";
         if (soundEnabled) playSound('tap');
       });
 
-      // Reset Button
-      document.getElementById("reset-btn").addEventListener("click", resetData);
+      // Reset Seed Data
+      document.getElementById("btn-reset-data").addEventListener("click", resetToFactorySeed);
 
-      // Calendar Navigations
-      document.getElementById("cal-prev-btn").addEventListener("click", () => {
+      // Kasunduan SMS / Copy
+      document.getElementById("btn-kasunduan").addEventListener("click", sendKasunduan);
+
+      // Calendar Month Navigations
+      document.getElementById("btn-cal-prev").addEventListener("click", () => {
         playSound('tap');
         currentCalDate.setMonth(currentCalDate.getMonth() - 1);
         renderCalendar();
       });
 
-      document.getElementById("cal-next-btn").addEventListener("click", () => {
+      document.getElementById("btn-cal-next").addEventListener("click", () => {
         playSound('tap');
         currentCalDate.setMonth(currentCalDate.getMonth() + 1);
         renderCalendar();
       });
 
-      // Clear Basket & Ilista
-      document.getElementById("clear-basket-btn").addEventListener("click", clearBasket);
-      const ilistaBtn = document.getElementById("btn-ilista") || document.getElementById("ilista-btn");
-      if (ilistaBtn) {
-        ilistaBtn.addEventListener("click", (e) => submitDebt(e));
-      }
-
-      // Quick Pay Chips
-      document.querySelectorAll(".pay-chip[data-pay]").forEach(chip => {
-        chip.addEventListener("click", (e) => {
-          const amt = parseInt(chip.getAttribute("data-pay"), 10);
-          handleQuickPay(amt, e);
+      // Tingi Micro-Amount Buttons (Action Locked)
+      const lockedAddTingi = withActionLock(addTingiToBasket, 300);
+      document.querySelectorAll(".btn-tingi-action").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const val = Number(btn.getAttribute("data-tingi"));
+          lockedAddTingi(val);
         });
       });
 
-      document.getElementById("pay-full-chip").addEventListener("click", (e) => {
-        handleQuickPay("FULL", e);
+      // Clear Basket
+      document.getElementById("btn-clear-basket").addEventListener("click", clearBasket);
+
+      // Ilista Commit Button (Action Locked)
+      const lockedSubmitDebt = withActionLock(executeSubmitDebt, 450);
+      document.getElementById("btn-ilista").addEventListener("click", lockedSubmitDebt);
+
+      // Quick Pay Chips (Action Locked)
+      const lockedQuickPay = withActionLock(executeQuickPay, 450);
+      document.querySelectorAll(".btn-quick-pay").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const val = btn.getAttribute("data-pay");
+          lockedQuickPay(val);
+        });
       });
+
+      // Dismiss Sukli Modal
+      document.getElementById("btn-dismiss-sukli").addEventListener("click", dismissSukliModal);
     }
 
-    // App Initialization
+    // App Startup
     document.addEventListener("DOMContentLoaded", () => {
-      initTheme();
-      initData();
+      loadState();
+      applyTheme(appState.theme || "dark");
       setupEventListeners();
       renderAll();
     });
