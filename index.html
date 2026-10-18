@@ -1,0 +1,1773 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>SariSync - Visual Credit & Repayment Speed Board</title>
+  <style>
+    /* CSS Custom Properties for Dark & Light Mode */
+    :root {
+      /* Dark Mode (Default) */
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --card-alt-bg: #111e33;
+      --border-color: #334155;
+      --text-primary: #f8fafc;
+      --text-muted: #94a3b8;
+      --cell-bg: #152238;
+      --cell-hover: #334155;
+      --input-bg: #0f172a;
+      
+      /* Semantic Accents */
+      --accent-green: #10b981;
+      --accent-green-dark: #059669;
+      --accent-green-bg: rgba(16, 185, 129, 0.15);
+      --caution-amber: #f59e0b;
+      --caution-amber-bg: rgba(245, 158, 11, 0.15);
+      --alert-red: #ef4444;
+      --alert-red-dark: #dc2626;
+      --alert-red-bg: rgba(239, 68, 68, 0.15);
+      
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+      
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+    }
+
+    /* Light Mode (Sunlight-Optimized High Contrast) */
+    [data-theme="light"] {
+      --bg-color: #f1f5f9;
+      --card-bg: #ffffff;
+      --card-alt-bg: #f8fafc;
+      --border-color: #cbd5e1;
+      --text-primary: #0f172a;
+      --text-muted: #475569;
+      --cell-bg: #f1f5f9;
+      --cell-hover: #e2e8f0;
+      --input-bg: #f8fafc;
+      
+      --accent-green: #059669;
+      --accent-green-dark: #047857;
+      --accent-green-bg: rgba(5, 150, 105, 0.12);
+      --caution-amber: #d97706;
+      --caution-amber-bg: rgba(217, 119, 6, 0.12);
+      --alert-red: #dc2626;
+      --alert-red-dark: #b91c1c;
+      --alert-red-bg: rgba(220, 38, 38, 0.12);
+      
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08);
+      --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-primary);
+      font-family: var(--font-family);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      line-height: 1.4;
+      overflow-x: hidden;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    #app-container {
+      width: 100%;
+      max-width: 480px;
+      min-height: 100vh;
+      background-color: var(--bg-color);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      padding-bottom: 32px;
+      transition: background-color 0.2s ease;
+    }
+
+    /* Tactile Touch Target Rule (Minimum 52px height) */
+    .touch-target,
+    button,
+    .product-tile,
+    .customer-chip,
+    .pay-chip {
+      touch-action: manipulation;
+      cursor: pointer;
+      transition: transform 0.08s ease, background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .touch-target:active,
+    button:active,
+    .product-tile:active,
+    .customer-chip:active,
+    .pay-chip:active {
+      transform: scale(0.95);
+    }
+
+    /* Top Quick Header */
+    .app-header {
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-logo {
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .brand-name {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+      color: var(--text-primary);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      background: var(--card-alt-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      width: 42px;
+      height: 42px;
+      min-height: 42px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+    }
+
+    /* Key Metric: Total Collectibles (₱) */
+    .total-collectible-card {
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border-color);
+      padding: 14px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .collectible-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 800;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+      margin-bottom: 2px;
+    }
+
+    .collectible-value {
+      font-size: 30px;
+      font-weight: 900;
+      color: var(--accent-green);
+      letter-spacing: -0.6px;
+    }
+
+    .header-pills-group {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+    }
+
+    .mini-pill {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 9px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .pill-muted {
+      background: var(--card-alt-bg);
+      color: var(--text-muted);
+      border: 1px solid var(--border-color);
+    }
+
+    .pill-alert {
+      background: var(--alert-red-bg);
+      color: var(--alert-red);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+    }
+
+    /* Customer Visual Chips (Horizontal Scroll) */
+    .customer-chips-section {
+      padding: 12px 16px 8px;
+    }
+
+    .customer-chips-scroll {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      scrollbar-width: none;
+    }
+
+    .customer-chips-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .customer-chip {
+      background: var(--card-bg);
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 8px 12px;
+      min-width: 128px;
+      min-height: 52px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .customer-chip.active {
+      border-color: var(--accent-green);
+      background: var(--accent-green-bg);
+      box-shadow: 0 0 0 1px var(--accent-green);
+    }
+
+    .customer-chip.alert-state {
+      border-color: var(--alert-red);
+    }
+
+    .customer-chip.alert-state.active {
+      background: var(--alert-red-bg);
+      box-shadow: 0 0 0 1px var(--alert-red);
+    }
+
+    .chip-avatar {
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .chip-content {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .chip-name-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4px;
+    }
+
+    .chip-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .dot-green { background-color: var(--accent-green); box-shadow: 0 0 6px var(--accent-green); }
+    .dot-yellow { background-color: var(--caution-amber); box-shadow: 0 0 6px var(--caution-amber); }
+    .dot-red { background-color: var(--alert-red); box-shadow: 0 0 6px var(--alert-red); }
+
+    .chip-debt-text {
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    /* Active Customer Detail & Calendar Card */
+    .customer-calendar-card {
+      margin: 4px 16px 12px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 14px 16px;
+      box-shadow: var(--shadow-md);
+      position: relative;
+    }
+
+    .cust-summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .cust-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .cust-title-wrap h2 {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: var(--text-primary);
+    }
+
+    .debt-badge {
+      font-size: 19px;
+      font-weight: 900;
+      letter-spacing: -0.4px;
+    }
+
+    /* Limit Meter Progress Bar */
+    .credit-meter-bar {
+      width: 100%;
+      height: 7px;
+      background: var(--cell-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    .credit-meter-fill {
+      height: 100%;
+      transition: width 0.3s ease, background-color 0.3s ease;
+      border-radius: 999px;
+    }
+
+    /* Calendar Header & Status Pill */
+    .calendar-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 6px;
+      margin-bottom: 8px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .cal-month-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .cal-nav-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 14px;
+      cursor: pointer;
+      padding: 2px 6px;
+      min-height: auto;
+    }
+
+    .cal-nav-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .last-borrowed-pill {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: var(--card-alt-bg);
+      color: var(--text-muted);
+      border: 1px solid var(--border-color);
+    }
+
+    /* Interactive Calendar Grid */
+    .cal-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+
+    .cal-cell {
+      aspect-ratio: 1;
+      background: var(--cell-bg);
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.12s ease;
+    }
+
+    .cal-cell.empty {
+      background: transparent;
+      cursor: default;
+    }
+
+    .cal-cell:hover:not(.empty) {
+      border-color: var(--border-color);
+    }
+
+    .cal-cell.is-today {
+      border-color: var(--accent-green);
+      font-weight: 900;
+    }
+
+    .cal-cell.is-selected {
+      background: var(--cell-hover);
+      border-color: #38bdf8;
+      box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+    }
+
+    .cal-day-num {
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--text-primary);
+    }
+
+    .cal-dots-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      margin-top: 3px;
+      min-height: 6px;
+    }
+
+    .cal-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+    }
+
+    .cal-dot-utang {
+      background-color: var(--alert-red);
+      box-shadow: 0 0 4px var(--alert-red);
+    }
+
+    .cal-dot-payment {
+      background-color: var(--accent-green);
+      box-shadow: 0 0 4px var(--accent-green);
+    }
+
+    /* Split Indicator (Dual Dot / Split Badge for days with both utang and bayad) */
+    .cal-split-pill {
+      display: flex;
+      width: 12px;
+      height: 5px;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .cal-split-left {
+      width: 50%;
+      height: 100%;
+      background-color: var(--alert-red);
+    }
+
+    .cal-split-right {
+      width: 50%;
+      height: 100%;
+      background-color: var(--accent-green);
+    }
+
+    /* Calendar Day Detail Inspection Card */
+    .cal-inspect-card {
+      background: var(--card-alt-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      font-size: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .inspect-date-title {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .inspect-item-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .inspect-item-desc {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .inspect-item-amt {
+      font-weight: 800;
+    }
+
+    /* One-Tap Staple Speed Board */
+    .speed-board-section {
+      padding: 0 16px 12px;
+    }
+
+    .section-header-title {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .product-tile {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      min-height: 54px;
+      padding: 8px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .product-tile.in-basket {
+      border-color: var(--accent-green);
+      background: var(--accent-green-bg);
+    }
+
+    .product-tile-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .prod-emoji {
+      font-size: 26px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .prod-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .prod-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .prod-price {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--accent-green);
+    }
+
+    .prod-badge {
+      background: var(--accent-green);
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 900;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* Action Bar & Quick Repayments */
+    .action-panel {
+      padding: 0 16px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .basket-bar-card {
+      background: var(--card-bg);
+      border: 2px solid var(--accent-green);
+      border-radius: var(--radius-lg);
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: 0 4px 12px var(--accent-green-bg);
+    }
+
+    .basket-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .basket-items-preview {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 260px;
+    }
+
+    .basket-total-text {
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--accent-green);
+    }
+
+    .btn-ilista {
+      background: var(--accent-green);
+      color: #ffffff;
+      border: none;
+      border-radius: var(--radius-md);
+      min-height: 52px;
+      font-size: 16px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-ilista:disabled {
+      background: var(--border-color);
+      color: var(--text-muted);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Quick Pay Row */
+    .quick-pay-wrap {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 12px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .quick-pay-label {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .pay-chips-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+    }
+
+    .pay-chip {
+      background: var(--card-alt-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      min-height: 52px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .pay-chip.full-pay {
+      background: var(--accent-green-bg);
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+      font-size: 11px;
+      font-weight: 900;
+      text-align: center;
+      padding: 2px 4px;
+    }
+
+    /* Recent Activity Timeline */
+    .timeline-section {
+      padding: 0 16px;
+    }
+
+    .timeline-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 12px 14px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .timeline-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .timeline-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-alt-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+      font-size: 13px;
+      border-left: 4px solid transparent;
+    }
+
+    .timeline-row.is-utang {
+      border-left-color: var(--alert-red);
+    }
+
+    .timeline-row.is-payment {
+      border-left-color: var(--accent-green);
+    }
+
+    .timeline-row-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .timeline-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .timeline-details {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .timeline-item-tag {
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .timeline-date {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .timeline-amt {
+      font-size: 15px;
+      font-weight: 900;
+      flex-shrink: 0;
+      text-align: right;
+    }
+
+    .timeline-empty {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      padding: 12px 0;
+    }
+
+    /* Toast Notification */
+    .toast-box {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      background: var(--card-bg);
+      border: 1px solid var(--accent-green);
+      color: var(--text-primary);
+      padding: 10px 16px;
+      border-radius: var(--radius-md);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+      animation: fadeInDown 0.2s ease-out;
+      width: 90%;
+      max-width: 380px;
+    }
+
+    .toast-box.toast-alert {
+      border-color: var(--alert-red);
+    }
+
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translate(-50%, -10px); }
+      to { opacity: 1; transform: translate(-50%, 0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="app-container">
+
+    <!-- Toast Notification Anchor -->
+    <div id="toast-anchor"></div>
+
+    <!-- Top Quick Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <span class="brand-logo">🏪</span>
+        <span class="brand-name">SariSync</span>
+      </div>
+      <div class="header-actions">
+        <!-- Dark / Light Mode Toggle Button -->
+        <button id="theme-toggle-btn" class="icon-btn touch-target" title="I-toggle ang Theme" aria-label="Toggle Theme">☀️</button>
+        <!-- Audio Feedback Toggle -->
+        <button id="sound-btn" class="icon-btn touch-target" title="Tunog" aria-label="Toggle Sound">🔊</button>
+        <!-- Reset Data Button -->
+        <button id="reset-btn" class="icon-btn touch-target" title="Reset Mock Data" aria-label="Reset Data">🔄</button>
+      </div>
+    </header>
+
+    <!-- Key Metric: Total Collectibles (₱) -->
+    <section class="total-collectible-card">
+      <div>
+        <div class="collectible-label">Total Collectibles</div>
+        <div id="metric-total-collectible" class="collectible-value">₱0</div>
+      </div>
+      <div class="header-pills-group">
+        <span id="pill-active-accounts" class="mini-pill pill-muted">3 Suki</span>
+        <span id="pill-flagged-accounts" class="mini-pill pill-alert" style="display: none;">1 Flagged</span>
+      </div>
+    </section>
+
+    <!-- Customer Visual Chips (Horizontal Scroll) -->
+    <section class="customer-chips-section">
+      <div class="customer-chips-scroll" id="customer-chips-container">
+        <!-- Rendered via JS -->
+      </div>
+    </section>
+
+    <!-- Active Customer Profile & Interactive Debt Calendar -->
+    <section class="customer-calendar-card" id="customer-calendar-card">
+      <div class="cust-summary-row">
+        <div class="cust-title-wrap">
+          <span id="active-cust-avatar" style="font-size: 26px;">👵</span>
+          <div>
+            <h2 id="active-cust-name">Aling Nena</h2>
+            <div id="active-cust-phone" style="font-size: 11px; color: var(--text-muted);">0917-123-4567</div>
+          </div>
+        </div>
+        <div style="text-align: right;">
+          <div id="active-cust-debt" class="debt-badge">₱320</div>
+          <div id="active-cust-limit" style="font-size: 11px; color: var(--text-muted);">Limit: ₱600</div>
+        </div>
+      </div>
+
+      <!-- Credit Limit Progress Bar -->
+      <div class="credit-meter-bar">
+        <div id="credit-meter-fill" class="credit-meter-fill" style="width: 53%; background-color: var(--caution-amber);"></div>
+      </div>
+
+      <!-- Calendar Header & Last Borrowed Status Pill -->
+      <div class="calendar-header-row">
+        <div class="cal-month-title">
+          <button id="cal-prev-btn" class="cal-nav-btn touch-target">◀</button>
+          <span id="cal-month-label">Oktubre 2026</span>
+          <button id="cal-next-btn" class="cal-nav-btn touch-target">▶</button>
+        </div>
+        <div id="last-borrowed-pill" class="last-borrowed-pill">Last borrowed: 3 days ago</div>
+      </div>
+
+      <!-- Weekday Headers -->
+      <div class="cal-weekdays">
+        <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
+      </div>
+
+      <!-- Interactive Calendar Grid -->
+      <div class="cal-grid" id="calendar-grid">
+        <!-- Injected via JS -->
+      </div>
+
+      <!-- Tap-to-Inspect Card -->
+      <div class="cal-inspect-card" id="cal-inspect-card">
+        <div class="inspect-date-title">
+          <span id="inspect-date-header">📅 Oktubre 15, 2026</span>
+          <span style="font-size: 10px; color: var(--accent-green); font-weight: 700;">Tap marked date to inspect</span>
+        </div>
+        <div id="inspect-content-list">
+          <!-- Injected via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- One-Tap Staple Speed Board -->
+    <section class="speed-board-section">
+      <div class="section-header-title">
+        <span>⚡ 1-Tap Staple Speed Board</span>
+        <span style="font-size: 10px; color: var(--accent-green); font-weight: 700;">Tap item to add</span>
+      </div>
+      <div class="product-grid" id="product-grid">
+        <!-- Rendered via JS -->
+      </div>
+    </section>
+
+    <!-- Action Bar & Quick Repayments -->
+    <section class="action-panel">
+
+      <!-- Running Basket Total Card -->
+      <div class="basket-bar-card">
+        <div class="basket-top-row">
+          <div>
+            <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--accent-green);">Basket: </span>
+            <span id="basket-items-preview" class="basket-items-preview">Pumili ng paninda</span>
+          </div>
+          <button id="clear-basket-btn" style="background: transparent; border: none; color: var(--text-muted); font-size: 11px; cursor: pointer; text-decoration: underline;">Clear</button>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">Kabuuang Halaga:</span>
+          <span id="basket-total-text" class="basket-total-text">₱0</span>
+        </div>
+        <button id="ilista-btn" class="btn-ilista touch-target" disabled>
+          <span>✍️</span> Ilista ang Utang (₱0)
+        </button>
+      </div>
+
+      <!-- Quick Pay Row -->
+      <div class="quick-pay-wrap">
+        <div class="quick-pay-label">
+          <span>💵 Mabilis na Bayad (Quick Pay)</span>
+          <span style="font-size: 10px;">1-Tap bawas utang</span>
+        </div>
+        <div class="pay-chips-grid">
+          <button class="pay-chip touch-target" data-pay="20">₱20</button>
+          <button class="pay-chip touch-target" data-pay="50">₱50</button>
+          <button class="pay-chip touch-target" data-pay="100">₱100</button>
+          <button class="pay-chip touch-target" data-pay="500">₱500</button>
+          <button class="pay-chip full-pay touch-target" id="pay-full-chip">Bayad Lahat</button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Recent Activity Timeline -->
+    <section class="timeline-section">
+      <div class="timeline-card">
+        <div class="section-header-title">
+          <span>🕒 Kamakailang Transaksyon</span>
+          <span style="font-size: 10px;">Huling 3 tala</span>
+        </div>
+        <div class="timeline-list" id="timeline-list">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    /**
+     * SariSync Visual Credit & Repayment Speed Board
+     * Self-contained prototype with Dark/Light mode, interactive calendar, and Web Audio
+     */
+
+    // Initial Mock Customers with past October 2026 transactions
+    const initialCustomers = [
+      {
+        id: "c1",
+        name: "Aling Nena",
+        avatar: "👵",
+        phone: "0917-123-4567",
+        totalDebt: 320,
+        creditLimit: 600,
+        history: [
+          { id: "tx1", type: "utang", amount: 150, items: "2x Coffee, 1x Noodles", date: "2026-10-15" },
+          { id: "tx2", type: "payment", amount: 50, date: "2026-10-16" },
+          { id: "tx3", type: "utang", amount: 220, items: "Rice 1kg, Sardines, Bread", date: "2026-10-12" }
+        ]
+      },
+      {
+        id: "c2",
+        name: "Mang Boy",
+        avatar: "👨",
+        phone: "0928-555-8899",
+        totalDebt: 850,
+        creditLimit: 800,
+        history: [
+          { id: "tx4", type: "utang", amount: 850, items: "Rice (5kg), Canned Goods", date: "2026-10-04" }
+        ]
+      },
+      {
+        id: "c3",
+        name: "Ate Joy",
+        avatar: "👩",
+        phone: "0919-888-2233",
+        totalDebt: 120,
+        creditLimit: 400,
+        history: [
+          { id: "tx5", type: "utang", amount: 120, items: "Shampoo, Eggs, Cooking Oil", date: "2026-10-17" },
+          { id: "tx6", type: "payment", amount: 100, date: "2026-10-10" },
+          { id: "tx7", type: "utang", amount: 100, items: "Coffee, Bread", date: "2026-10-08" }
+        ]
+      }
+    ];
+
+    // 8 Staple Speed Board Products
+    const stapleProducts = [
+      { id: "p1", name: "Coffee", price: 15, emoji: "☕" },
+      { id: "p2", name: "Noodles", price: 18, emoji: "🍜" },
+      { id: "p3", name: "Sardines", price: 28, emoji: "🐟" },
+      { id: "p4", name: "Egg", price: 10, emoji: "🥚" },
+      { id: "p5", name: "Rice 1kg", price: 52, emoji: "🍚" },
+      { id: "p6", name: "Shampoo", price: 8, emoji: "🧴" },
+      { id: "p7", name: "Cooking Oil", price: 20, emoji: "🫗" },
+      { id: "p8", name: "Bread", price: 20, emoji: "🥖" }
+    ];
+
+    // Application State
+    let customers = [];
+    let selectedCustomerId = "c1";
+    let activeBasket = {}; // { [productId]: quantity }
+    let soundEnabled = true;
+    let currentTheme = "dark";
+
+    // Calendar State
+    let currentCalDate = new Date(2026, 9, 1); // October 2026 (Month 9 is October)
+    let selectedInspectedDate = "2026-10-18"; // Default selected date (today)
+
+    // Web Audio Synthesizer
+    let audioCtx = null;
+    function getAudioContext() {
+      if (!audioCtx) {
+        const AudioClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioClass) audioCtx = new AudioClass();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function playSound(type) {
+      if (!soundEnabled) return;
+      try {
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (type === 'tap') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(420, now);
+          osc.frequency.exponentialRampToValueAtTime(840, now + 0.04);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
+          osc.start(now);
+          osc.stop(now + 0.04);
+        } else if (type === 'cash') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(987, now);
+          gain.gain.setValueAtTime(0.25, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.22);
+          osc.start(now);
+          osc.stop(now + 0.22);
+
+          const osc2 = ctx.createOscillator();
+          const gain2 = ctx.createGain();
+          osc2.connect(gain2);
+          gain2.connect(ctx.destination);
+          osc2.type = 'sine';
+          osc2.frequency.setValueAtTime(1318, now + 0.08);
+          gain2.gain.setValueAtTime(0.3, now + 0.08);
+          gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+          osc2.start(now + 0.08);
+          osc2.stop(now + 0.3);
+        } else if (type === 'stamp') {
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(160, now);
+          osc.frequency.exponentialRampToValueAtTime(50, now + 0.1);
+          gain.gain.setValueAtTime(0.25, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+          osc.start(now);
+          osc.stop(now + 0.1);
+        } else if (type === 'alert') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(220, now);
+          osc.frequency.setValueAtTime(170, now + 0.1);
+          gain.gain.setValueAtTime(0.25, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+          osc.start(now);
+          osc.stop(now + 0.2);
+        }
+      } catch (e) {
+        console.warn("Audio feedback error", e);
+      }
+    }
+
+    // Theme Management
+    function initTheme() {
+      const savedTheme = localStorage.getItem("sarisync_theme");
+      if (savedTheme === "light" || savedTheme === "dark") {
+        currentTheme = savedTheme;
+      } else {
+        currentTheme = "dark";
+      }
+      applyTheme(currentTheme);
+    }
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute("data-theme", theme);
+      const btn = document.getElementById("theme-toggle-btn");
+      if (btn) {
+        // When in dark mode, button icon is Sun ☀️ (tap for light); when in light mode, button icon is Moon 🌙 (tap for dark)
+        btn.textContent = theme === "dark" ? "☀️" : "🌙";
+        btn.setAttribute("title", theme === "dark" ? "Lumipat sa Sunlight / Light Mode" : "Lumipat sa Dark Mode");
+      }
+      localStorage.setItem("sarisync_theme", theme);
+    }
+
+    function toggleTheme() {
+      playSound('tap');
+      currentTheme = currentTheme === "dark" ? "light" : "dark";
+      applyTheme(currentTheme);
+      showToast(currentTheme === "light" ? "Naka-activate ang Sunlight Mode! ☀️" : "Naka-activate ang Dark Mode! 🌙");
+    }
+
+    // Toast Notification
+    function showToast(message, isAlert = false) {
+      const anchor = document.getElementById("toast-anchor");
+      const toast = document.createElement("div");
+      toast.className = `toast-box ${isAlert ? "toast-alert" : ""}`;
+      toast.innerHTML = `<span>${isAlert ? "⚠️" : "✅"}</span> <span>${message}</span>`;
+      anchor.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.transition = "opacity 0.25s ease";
+        setTimeout(() => toast.remove(), 250);
+      }, 2400);
+    }
+
+    // LocalStorage Initialization & Persistence
+    function initData() {
+      const stored = localStorage.getItem("sarisync_speedboard_data");
+      if (stored) {
+        try {
+          customers = JSON.parse(stored);
+        } catch (e) {
+          customers = JSON.parse(JSON.stringify(initialCustomers));
+          saveData();
+        }
+      } else {
+        customers = JSON.parse(JSON.stringify(initialCustomers));
+        saveData();
+      }
+
+      if (!customers.find(c => c.id === selectedCustomerId) && customers.length > 0) {
+        selectedCustomerId = customers[0].id;
+      }
+    }
+
+    function saveData() {
+      localStorage.setItem("sarisync_speedboard_data", JSON.stringify(customers));
+    }
+
+    function resetData() {
+      if (confirm("I-reset ang lahat ng data sa panimulang talaan?")) {
+        customers = JSON.parse(JSON.stringify(initialCustomers));
+        selectedCustomerId = "c1";
+        activeBasket = {};
+        currentCalDate = new Date(2026, 9, 1);
+        selectedInspectedDate = "2026-10-18";
+        saveData();
+        renderAll();
+        showToast("Na-reset ang SariSync sa mock data!");
+      }
+    }
+
+    function getSelectedCustomer() {
+      return customers.find(c => c.id === selectedCustomerId) || customers[0];
+    }
+
+    // Date Utilities
+    function parseIsoDate(isoStr) {
+      const [y, m, d] = isoStr.split("-").map(Number);
+      return new Date(y, m - 1, d);
+    }
+
+    function getTodayIso() {
+      return "2026-10-18";
+    }
+
+    function calculateDaysAgo(dateStr) {
+      const today = parseIsoDate(getTodayIso());
+      const past = parseIsoDate(dateStr);
+      const diffMs = today.getTime() - past.getTime();
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      return Math.max(0, diffDays);
+    }
+
+    // Customer Status (Traffic Light)
+    function getCustomerStatus(cust) {
+      if (cust.totalDebt > cust.creditLimit) {
+        return { color: "dot-red", status: "red" };
+      }
+      if (cust.totalDebt >= cust.creditLimit * 0.7) {
+        return { color: "dot-yellow", status: "yellow" };
+      }
+      return { color: "dot-green", status: "green" };
+    }
+
+    // Basket Operations
+    function addProductToBasket(prodId) {
+      playSound('tap');
+      if (!activeBasket[prodId]) {
+        activeBasket[prodId] = 0;
+      }
+      activeBasket[prodId] += 1;
+      renderBasket();
+      renderProductGrid();
+    }
+
+    function clearBasket() {
+      playSound('tap');
+      activeBasket = {};
+      renderBasket();
+      renderProductGrid();
+    }
+
+    function getBasketTotal() {
+      let total = 0;
+      for (const [id, qty] of Object.entries(activeBasket)) {
+        const prod = stapleProducts.find(p => p.id === id);
+        if (prod) total += prod.price * qty;
+      }
+      return total;
+    }
+
+    function getBasketSummaryText() {
+      const items = [];
+      for (const [id, qty] of Object.entries(activeBasket)) {
+        const prod = stapleProducts.find(p => p.id === id);
+        if (prod && qty > 0) {
+          items.push(`${qty}x ${prod.name}`);
+        }
+      }
+      return items.length > 0 ? items.join(", ") : "Pumili ng paninda";
+    }
+
+    // Log Debt ("Ilista")
+    function submitDebt() {
+      const cust = getSelectedCustomer();
+      if (!cust) return;
+      const total = getBasketTotal();
+      if (total <= 0) return;
+
+      const isOver = (cust.totalDebt + total) > cust.creditLimit;
+      if (isOver) {
+        playSound('alert');
+      } else {
+        playSound('stamp');
+      }
+
+      const todayStr = getTodayIso();
+      const summary = getBasketSummaryText();
+
+      const newTx = {
+        id: "tx_" + Date.now(),
+        type: "utang",
+        amount: total,
+        items: summary,
+        date: todayStr
+      };
+
+      cust.totalDebt += total;
+      if (!cust.history) cust.history = [];
+      cust.history.unshift(newTx);
+
+      saveData();
+      showToast(`Naitala ang ₱${total} utang ni ${cust.name}!`, isOver);
+
+      activeBasket = {};
+      selectedInspectedDate = todayStr;
+      renderAll();
+    }
+
+    // Quick Repayments
+    function handleQuickPay(amount) {
+      const cust = getSelectedCustomer();
+      if (!cust) return;
+      if (cust.totalDebt <= 0) {
+        showToast("Walang natitirang utang ang suki!", false);
+        return;
+      }
+
+      const actualPayment = Math.min(amount, cust.totalDebt);
+      const todayStr = getTodayIso();
+
+      const newTx = {
+        id: "tx_" + Date.now(),
+        type: "payment",
+        amount: actualPayment,
+        date: todayStr
+      };
+
+      cust.totalDebt -= actualPayment;
+      if (!cust.history) cust.history = [];
+      cust.history.unshift(newTx);
+
+      saveData();
+      playSound('cash');
+      showToast(`Natanggap ang ₱${actualPayment} bayad ni ${cust.name}!`);
+
+      selectedInspectedDate = todayStr;
+      renderAll();
+    }
+
+    // Render Methods
+    function renderTopMetrics() {
+      const totalCollectible = customers.reduce((sum, c) => sum + (c.totalDebt || 0), 0);
+      document.getElementById("metric-total-collectible").textContent = `₱${totalCollectible.toLocaleString()}`;
+
+      document.getElementById("pill-active-accounts").textContent = `${customers.length} Suki`;
+
+      const flaggedCount = customers.filter(c => c.totalDebt > c.creditLimit).length;
+      const flaggedPill = document.getElementById("pill-flagged-accounts");
+      if (flaggedCount > 0) {
+        flaggedPill.style.display = "inline-flex";
+        flaggedPill.textContent = `${flaggedCount} Flagged`;
+      } else {
+        flaggedPill.style.display = "none";
+      }
+    }
+
+    function renderCustomerChips() {
+      const container = document.getElementById("customer-chips-container");
+      container.innerHTML = "";
+
+      customers.forEach(cust => {
+        const isSelected = cust.id === selectedCustomerId;
+        const status = getCustomerStatus(cust);
+
+        const chip = document.createElement("div");
+        chip.className = `customer-chip touch-target ${isSelected ? "active" : ""} ${status.status === "red" ? "alert-state" : ""}`;
+
+        chip.innerHTML = `
+          <span class="chip-avatar">${cust.avatar || "👤"}</span>
+          <div class="chip-content">
+            <div class="chip-name-row">
+              <span class="chip-name">${cust.name}</span>
+              <span class="status-dot ${status.color}"></span>
+            </div>
+            <div class="chip-debt-text" style="color: ${status.status === 'red' ? 'var(--alert-red)' : status.status === 'yellow' ? 'var(--caution-amber)' : 'var(--text-primary)'}">
+              ₱${cust.totalDebt.toLocaleString()}
+            </div>
+          </div>
+        `;
+
+        chip.addEventListener("click", () => {
+          if (selectedCustomerId !== cust.id) {
+            playSound('tap');
+            selectedCustomerId = cust.id;
+            renderAll();
+          }
+        });
+
+        container.appendChild(chip);
+      });
+    }
+
+    function renderActiveCustomer() {
+      const cust = getSelectedCustomer();
+      if (!cust) return;
+
+      document.getElementById("active-cust-avatar").textContent = cust.avatar || "👤";
+      document.getElementById("active-cust-name").textContent = cust.name;
+      document.getElementById("active-cust-phone").textContent = cust.phone;
+
+      const debtEl = document.getElementById("active-cust-debt");
+      debtEl.textContent = `₱${cust.totalDebt.toLocaleString()}`;
+      document.getElementById("active-cust-limit").textContent = `Limit: ₱${cust.creditLimit.toLocaleString()}`;
+
+      const status = getCustomerStatus(cust);
+      if (status.status === "red") {
+        debtEl.style.color = "var(--alert-red)";
+      } else if (status.status === "yellow") {
+        debtEl.style.color = "var(--caution-amber)";
+      } else {
+        debtEl.style.color = "var(--text-primary)";
+      }
+
+      // Progress Meter
+      const percentage = Math.min(100, Math.round((cust.totalDebt / cust.creditLimit) * 100));
+      const meterFill = document.getElementById("credit-meter-fill");
+      meterFill.style.width = `${percentage}%`;
+      meterFill.style.backgroundColor = status.status === "red" ? "var(--alert-red)" : status.status === "yellow" ? "var(--caution-amber)" : "var(--accent-green)";
+
+      // Last Borrowed Status Pill
+      const lastUtang = (cust.history || []).find(h => h.type === "utang");
+      const pill = document.getElementById("last-borrowed-pill");
+      if (lastUtang) {
+        const days = calculateDaysAgo(lastUtang.date);
+        pill.textContent = days === 0 ? "Last borrowed: Today" : days === 1 ? "Last borrowed: Yesterday" : `Last borrowed: ${days} days ago`;
+        if (days >= 14) {
+          pill.style.background = "var(--alert-red-bg)";
+          pill.style.color = "var(--alert-red)";
+          pill.style.borderColor = "rgba(239, 68, 68, 0.4)";
+        } else {
+          pill.style.background = "var(--card-alt-bg)";
+          pill.style.color = "var(--text-muted)";
+          pill.style.borderColor = "var(--border-color)";
+        }
+      } else {
+        pill.textContent = "No borrowed credit";
+      }
+    }
+
+    function renderCalendar() {
+      const cust = getSelectedCustomer();
+      const grid = document.getElementById("calendar-grid");
+      grid.innerHTML = "";
+
+      const year = currentCalDate.getFullYear();
+      const month = currentCalDate.getMonth();
+
+      const monthNames = [
+        "Enero", "Pebrero", "Marso", "Abril", "Mayo", "Hunyo",
+        "Hulyo", "Agosto", "Setyembre", "Oktubre", "Nobyembre", "Disyembre"
+      ];
+      document.getElementById("cal-month-label").textContent = `${monthNames[month]} ${year}`;
+
+      const firstDayIndex = new Date(year, month, 1).getDay();
+      const totalDays = new Date(year, month + 1, 0).getDate();
+
+      // Empty padding cells before first day
+      for (let i = 0; i < firstDayIndex; i++) {
+        const emptyCell = document.createElement("div");
+        emptyCell.className = "cal-cell empty";
+        grid.appendChild(emptyCell);
+      }
+
+      const todayStr = getTodayIso();
+      const history = cust ? (cust.history || []) : [];
+
+      for (let day = 1; day <= totalDays; day++) {
+        const cell = document.createElement("div");
+        const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+        const isToday = dateStr === todayStr;
+        const isSelected = dateStr === selectedInspectedDate;
+
+        cell.className = `cal-cell touch-target ${isToday ? "is-today" : ""} ${isSelected ? "is-selected" : ""}`;
+
+        // Transactions on this day
+        const dayTxs = history.filter(t => t.date === dateStr);
+        const hasUtang = dayTxs.some(t => t.type === "utang");
+        const hasPayment = dayTxs.some(t => t.type === "payment");
+
+        let indicatorHtml = `<div class="cal-dots-wrap">`;
+        if (hasUtang && hasPayment) {
+          // Split indicator when both occurred on same day
+          indicatorHtml += `
+            <div class="cal-split-pill" title="Utang at Bayad">
+              <div class="cal-split-left"></div>
+              <div class="cal-split-right"></div>
+            </div>
+          `;
+        } else if (hasUtang) {
+          indicatorHtml += `<span class="cal-dot cal-dot-utang" title="Utang"></span>`;
+        } else if (hasPayment) {
+          indicatorHtml += `<span class="cal-dot cal-dot-payment" title="Bayad"></span>`;
+        }
+        indicatorHtml += `</div>`;
+
+        cell.innerHTML = `
+          <span class="cal-day-num">${day}</span>
+          ${indicatorHtml}
+        `;
+
+        cell.addEventListener("click", () => {
+          playSound('tap');
+          selectedInspectedDate = dateStr;
+          renderCalendar();
+          renderInspectCard();
+        });
+
+        grid.appendChild(cell);
+      }
+
+      renderInspectCard();
+    }
+
+    function renderInspectCard() {
+      const cust = getSelectedCustomer();
+      const container = document.getElementById("inspect-content-list");
+      const titleEl = document.getElementById("inspect-date-header");
+
+      const [y, m, d] = selectedInspectedDate.split("-");
+      const monthNames = [
+        "Enero", "Pebrero", "Marso", "Abril", "Mayo", "Hunyo",
+        "Hulyo", "Agosto", "Setyembre", "Oktubre", "Nobyembre", "Disyembre"
+      ];
+      titleEl.textContent = `📅 ${monthNames[parseInt(m, 10) - 1]} ${parseInt(d, 10)}, ${y}`;
+
+      const history = cust ? (cust.history || []) : [];
+      const dayTxs = history.filter(t => t.date === selectedInspectedDate);
+
+      if (dayTxs.length === 0) {
+        container.innerHTML = `<div style="color: var(--text-muted); font-size: 11px; padding: 2px 0;">Walang transaksyon sa petsang ito.</div>`;
+        return;
+      }
+
+      container.innerHTML = "";
+      dayTxs.forEach(tx => {
+        const isUtang = tx.type === "utang";
+        const row = document.createElement("div");
+        row.className = "inspect-item-row";
+        row.innerHTML = `
+          <div class="inspect-item-desc">
+            ${isUtang ? "🔴 Utang:" : "🟢 Bayad:"} ${tx.items ? tx.items : "Cash payment"}
+          </div>
+          <div class="inspect-item-amt" style="color: ${isUtang ? 'var(--alert-red)' : 'var(--accent-green)'}">
+            ${isUtang ? `+₱${tx.amount.toLocaleString()}` : `-₱${tx.amount.toLocaleString()}`}
+          </div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function renderProductGrid() {
+      const grid = document.getElementById("product-grid");
+      grid.innerHTML = "";
+
+      stapleProducts.forEach(prod => {
+        const qty = activeBasket[prod.id] || 0;
+        const tile = document.createElement("div");
+        tile.className = `product-tile touch-target ${qty > 0 ? "in-basket" : ""}`;
+
+        tile.innerHTML = `
+          <div class="product-tile-left">
+            <span class="prod-emoji">${prod.emoji}</span>
+            <div class="prod-info">
+              <span class="prod-name">${prod.name}</span>
+              <span class="prod-price">₱${prod.price}</span>
+            </div>
+          </div>
+          ${qty > 0 ? `<span class="prod-badge">+${qty}</span>` : ""}
+        `;
+
+        tile.addEventListener("click", () => {
+          addProductToBasket(prod.id);
+        });
+
+        grid.appendChild(tile);
+      });
+    }
+
+    function renderBasket() {
+      const previewEl = document.getElementById("basket-items-preview");
+      const totalEl = document.getElementById("basket-total-text");
+      const btn = document.getElementById("ilista-btn");
+
+      const total = getBasketTotal();
+      previewEl.textContent = getBasketSummaryText();
+      totalEl.textContent = `₱${total.toLocaleString()}`;
+
+      if (total > 0) {
+        btn.disabled = false;
+        btn.innerHTML = `<span>✍️</span> Ilista ang Utang (₱${total.toLocaleString()})`;
+      } else {
+        btn.disabled = true;
+        btn.innerHTML = `<span>✍️</span> Ilista ang Utang (₱0)`;
+      }
+    }
+
+    function renderQuickPay() {
+      const cust = getSelectedCustomer();
+      const fullPayChip = document.getElementById("pay-full-chip");
+      if (cust && cust.totalDebt > 0) {
+        fullPayChip.innerHTML = `Bayad Lahat<br>₱${cust.totalDebt.toLocaleString()}`;
+        fullPayChip.disabled = false;
+      } else {
+        fullPayChip.innerHTML = `Bayad Lahat<br>₱0`;
+        fullPayChip.disabled = true;
+      }
+    }
+
+    function renderTimeline() {
+      const cust = getSelectedCustomer();
+      const list = document.getElementById("timeline-list");
+      list.innerHTML = "";
+
+      const history = cust ? (cust.history || []) : [];
+      const recentThree = history.slice(0, 3);
+
+      if (recentThree.length === 0) {
+        list.innerHTML = `<div class="timeline-empty">Walang nakaraang transaksyon.</div>`;
+        return;
+      }
+
+      recentThree.forEach(tx => {
+        const isUtang = tx.type === "utang";
+        const row = document.createElement("div");
+        row.className = `timeline-row ${isUtang ? "is-utang" : "is-payment"}`;
+
+        row.innerHTML = `
+          <div class="timeline-row-left">
+            <span class="timeline-dot ${isUtang ? 'dot-red' : 'dot-green'}"></span>
+            <div class="timeline-details">
+              <span class="timeline-item-tag">${isUtang ? (tx.items || "Utang") : "Ibinayad"}</span>
+              <span class="timeline-date">${tx.date}</span>
+            </div>
+          </div>
+          <div class="timeline-amt" style="color: ${isUtang ? 'var(--alert-red)' : 'var(--accent-green)'}">
+            ${isUtang ? `+₱${tx.amount.toLocaleString()}` : `-₱${tx.amount.toLocaleString()}`}
+          </div>
+        `;
+
+        list.appendChild(row);
+      });
+    }
+
+    function renderAll() {
+      renderTopMetrics();
+      renderCustomerChips();
+      renderActiveCustomer();
+      renderCalendar();
+      renderProductGrid();
+      renderBasket();
+      renderQuickPay();
+      renderTimeline();
+    }
+
+    // Event Listeners Setup
+    function setupEventListeners() {
+      // Theme Toggle (☀️ / 🌙)
+      document.getElementById("theme-toggle-btn").addEventListener("click", toggleTheme);
+
+      // Sound Toggle
+      const soundBtn = document.getElementById("sound-btn");
+      soundBtn.addEventListener("click", () => {
+        soundEnabled = !soundEnabled;
+        soundBtn.textContent = soundEnabled ? "🔊" : "🔇";
+        if (soundEnabled) playSound('tap');
+      });
+
+      // Reset Button
+      document.getElementById("reset-btn").addEventListener("click", resetData);
+
+      // Calendar Navigations
+      document.getElementById("cal-prev-btn").addEventListener("click", () => {
+        playSound('tap');
+        currentCalDate.setMonth(currentCalDate.getMonth() - 1);
+        renderCalendar();
+      });
+
+      document.getElementById("cal-next-btn").addEventListener("click", () => {
+        playSound('tap');
+        currentCalDate.setMonth(currentCalDate.getMonth() + 1);
+        renderCalendar();
+      });
+
+      // Clear Basket & Ilista
+      document.getElementById("clear-basket-btn").addEventListener("click", clearBasket);
+      document.getElementById("ilista-btn").addEventListener("click", submitDebt);
+
+      // Quick Pay Chips
+      document.querySelectorAll(".pay-chip[data-pay]").forEach(chip => {
+        chip.addEventListener("click", () => {
+          const amt = parseInt(chip.getAttribute("data-pay"), 10);
+          handleQuickPay(amt);
+        });
+      });
+
+      document.getElementById("pay-full-chip").addEventListener("click", () => {
+        const cust = getSelectedCustomer();
+        if (cust && cust.totalDebt > 0) {
+          handleQuickPay(cust.totalDebt);
+        }
+      });
+    }
+
+    // App Initialization
+    document.addEventListener("DOMContentLoaded", () => {
+      initTheme();
+      initData();
+      setupEventListeners();
+      renderAll();
+    });
+  </script>
+</body>
+</html>
