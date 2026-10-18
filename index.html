@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>SariSync Speed Board - Talaan ng Bayan</title>
+  <title>SariSync - Micro-Retail Speed Board</title>
   <style>
-    /* CSS Custom Properties & High-Contrast Design System */
+    /* Design Tokens: Maya & Apple Wallet Inspired Fintech Palette */
     :root {
       /* Dark Mode (Default) */
       --bg-backdrop: #020617;
@@ -18,7 +18,7 @@
       --text-muted: #94a3b8;
       --cell-bg: #152238;
       --cell-hover: #334155;
-      --input-bg: #0f172a;
+      --tab-active-bg: rgba(16, 185, 129, 0.15);
       
       /* Standardized Accents */
       --accent-green: #10b981;
@@ -38,6 +38,7 @@
       --radius-sm: 8px;
       --radius-md: 12px;
       --radius-lg: 16px;
+      --bottom-bar-height: 64px;
     }
 
     /* Light Mode (Sunlight-Proof / WCAG AAA Glare Resistant) */
@@ -52,7 +53,7 @@
       --text-muted: #1e293b;   /* Deep slate, 9.2:1 contrast */
       --cell-bg: #f1f5f9;
       --cell-hover: #e2e8f0;
-      --input-bg: #ffffff;
+      --tab-active-bg: rgba(5, 150, 105, 0.15);
       
       --accent-green: #059669;
       --accent-green-dark: #047857;
@@ -89,7 +90,6 @@
       transition: background-color 0.2s ease, color 0.2s ease;
     }
 
-    /* Mobile-First Layout (Max width 480px, Centered on Desktop) */
     #app-container {
       width: 100%;
       max-width: 480px;
@@ -98,18 +98,19 @@
       display: flex;
       flex-direction: column;
       position: relative;
-      padding-bottom: 24px;
-      box-shadow: 0 0 30px rgba(0, 0, 0, 0.35);
+      padding-bottom: calc(var(--bottom-bar-height) + 16px);
+      box-shadow: 0 0 32px rgba(0, 0, 0, 0.4);
       transition: background-color 0.2s ease;
     }
 
-    /* Tactile Touch Target Rules (Min 48px - 54px with active scale-down) */
+    /* Tactile Touch Target Rules */
     .touch-target,
     button,
     .product-tile,
     .customer-chip,
     .tingi-pill,
-    .pay-chip {
+    .pay-chip,
+    .bottom-tab-btn {
       touch-action: manipulation;
       cursor: pointer;
       min-height: 48px;
@@ -121,7 +122,8 @@
     .product-tile:active,
     .customer-chip:active,
     .tingi-pill:active,
-    .pay-chip:active {
+    .pay-chip:active,
+    .bottom-tab-btn:active {
       transform: scale(0.96);
     }
 
@@ -133,7 +135,7 @@
       transform: none !important;
     }
 
-    /* 1. Header Bar */
+    /* Top Quick Header */
     .app-header {
       background: var(--bg-card);
       border-bottom: 2px solid var(--border-color);
@@ -175,7 +177,7 @@
 
     .brand-sub {
       font-size: 10px;
-      font-weight: 700;
+      font-weight: 800;
       color: var(--text-muted);
       letter-spacing: 0.5px;
       text-transform: uppercase;
@@ -191,21 +193,21 @@
       background: var(--bg-card-alt);
       border: 1px solid var(--border-color);
       color: var(--text-primary);
-      width: 44px;
-      height: 44px;
-      min-height: 44px;
+      width: 42px;
+      height: 42px;
+      min-height: 42px;
       border-radius: var(--radius-sm);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
+      font-size: 17px;
     }
 
     /* Aggregated Counter Metric: Kabuuang Pautang */
     .metric-counter-banner {
       background: var(--bg-card);
       border-bottom: 2px solid var(--border-color);
-      padding: 14px 16px;
+      padding: 12px 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -221,7 +223,7 @@
     }
 
     .metric-value {
-      font-size: 30px;
+      font-size: 28px;
       font-weight: 900;
       color: var(--accent-green);
       letter-spacing: -0.6px;
@@ -256,9 +258,9 @@
       border: 1px solid var(--accent-rose);
     }
 
-    /* 2. Customer Selector Ribbon */
+    /* Persistent Customer Selector Ribbon */
     .customer-ribbon-section {
-      padding: 12px 16px 8px;
+      padding: 10px 16px 8px;
     }
 
     .customer-scroll-row {
@@ -347,14 +349,329 @@
       font-weight: 900;
     }
 
-    /* 3. Customer Credit & Risk Card */
+    /* Tab Panes */
+    .tab-pane {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      padding: 0 16px 12px;
+      animation: fadeInTab 0.15s ease-out;
+    }
+
+    .tab-pane.active {
+      display: flex;
+    }
+
+    @keyframes fadeInTab {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Tab 1: Benta (Speed Board & Basket) */
+    .tingi-pill-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+
+    .tingi-pill {
+      background: var(--bg-card);
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .tingi-pill:active {
+      border-color: var(--accent-green);
+      background: var(--accent-green-bg);
+    }
+
+    .speed-board-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .product-tile {
+      background: var(--bg-card);
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-md);
+      min-height: 52px;
+      padding: 8px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .product-tile.in-basket {
+      border-color: var(--accent-green);
+      background: var(--accent-green-bg);
+    }
+
+    .tile-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .tile-emoji {
+      font-size: 26px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .tile-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .tile-name {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tile-price {
+      font-size: 13px;
+      font-weight: 900;
+      color: var(--accent-green);
+    }
+
+    .tile-badge {
+      background: var(--accent-green);
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 900;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .basket-counter-card {
+      background: var(--bg-card);
+      border: 2px solid var(--accent-green);
+      border-radius: var(--radius-lg);
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: 0 4px 14px var(--accent-green-bg);
+    }
+
+    .basket-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .basket-items-preview {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 270px;
+    }
+
+    .btn-clear-basket {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 800;
+      text-decoration: underline;
+      cursor: pointer;
+      min-height: auto;
+    }
+
+    .basket-total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .basket-total-label {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .basket-total-amount {
+      font-size: 26px;
+      font-weight: 900;
+      color: var(--accent-green);
+    }
+
+    .btn-ilista {
+      background: var(--accent-green);
+      color: #ffffff;
+      border: none;
+      border-radius: var(--radius-md);
+      min-height: 52px;
+      font-size: 16px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Tab 2: Bayad (Repayment & Sukli) */
+    .pay-card-section {
+      background: var(--bg-card);
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: var(--shadow-sm);
+      text-align: center;
+    }
+
+    .pay-target-title {
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .pay-debt-big {
+      font-size: 36px;
+      font-weight: 900;
+      color: var(--accent-rose);
+      letter-spacing: -0.5px;
+    }
+
+    .pay-chips-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+    }
+
+    .pay-chip {
+      background: var(--bg-card-alt);
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      min-height: 52px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .pay-chip.full-pay {
+      background: var(--accent-green-bg);
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+      font-size: 11px;
+      font-weight: 900;
+      text-align: center;
+      line-height: 1.1;
+      padding: 2px 4px;
+    }
+
+    /* Custom Tender Numpad */
+    .numpad-box {
+      background: var(--bg-card);
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .numpad-screen {
+      background: var(--bg-card-alt);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .numpad-screen-label {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .numpad-screen-val {
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--accent-green);
+    }
+
+    .numpad-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+
+    .numpad-key {
+      background: var(--bg-card-alt);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      min-height: 48px;
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .numpad-key.key-action {
+      background: var(--bg-card);
+      color: var(--accent-amber);
+    }
+
+    .btn-numpad-pay {
+      background: var(--accent-green);
+      color: #ffffff;
+      border: none;
+      border-radius: var(--radius-md);
+      min-height: 52px;
+      font-size: 16px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    /* Tab 3: Talaan (Customer Profile & Calendar) */
     .customer-profile-card {
-      margin: 4px 16px 10px;
       background: var(--bg-card);
       border: 2px solid var(--border-color);
       border-radius: var(--radius-lg);
       padding: 14px 16px;
-      box-shadow: var(--shadow-md);
+      box-shadow: var(--shadow-sm);
       display: flex;
       flex-direction: column;
       gap: 10px;
@@ -380,23 +697,12 @@
       margin-top: 2px;
     }
 
-    .profile-debt-block {
-      text-align: right;
-    }
-
     .profile-debt-amt {
       font-size: 22px;
       font-weight: 900;
       letter-spacing: -0.5px;
     }
 
-    .profile-limit-text {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text-muted);
-    }
-
-    /* Credit Limit Meter Bar */
     .credit-progress-bar {
       width: 100%;
       height: 8px;
@@ -412,7 +718,6 @@
       transition: width 0.3s ease, background-color 0.3s ease;
     }
 
-    /* AI-Style Rule-Based Advisory Banner */
     .advisory-banner {
       border-radius: var(--radius-sm);
       padding: 8px 12px;
@@ -441,7 +746,6 @@
       border: 1px solid var(--accent-green);
     }
 
-    /* 1-Tap Kasunduan SMS Button */
     .btn-kasunduan {
       background: var(--bg-card-alt);
       border: 1.5px solid var(--border-color);
@@ -458,9 +762,7 @@
       width: 100%;
     }
 
-    /* 4. Interactive Mini Calendar (Presbyopia Accessible) */
     .calendar-container {
-      margin: 0 16px 12px;
       background: var(--bg-card);
       border: 2px solid var(--border-color);
       border-radius: var(--radius-lg);
@@ -559,7 +861,6 @@
       color: var(--text-primary);
     }
 
-    /* 9px Presbyopia Accessible Dots */
     .cal-marker-row {
       display: flex;
       align-items: center;
@@ -607,7 +908,6 @@
       background-color: var(--accent-green);
     }
 
-    /* Calendar Day Detail Inspection Popover */
     .cal-inspect-popover {
       background: var(--bg-card-alt);
       border: 1.5px solid var(--border-color);
@@ -645,245 +945,6 @@
       text-align: right;
     }
 
-    /* Lower 60% Ergonomic Thumb Zone */
-    .thumb-zone {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      padding: 0 16px;
-    }
-
-    /* 5. Micro-Credit "Tingi" Bar */
-    .tingi-bar-section {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .section-headline {
-      font-size: 11px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-      color: var(--text-muted);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .tingi-pill-row {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 6px;
-    }
-
-    .tingi-pill {
-      background: var(--bg-card);
-      border: 2px solid var(--border-color);
-      border-radius: var(--radius-sm);
-      color: var(--text-primary);
-      font-size: 13px;
-      font-weight: 900;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .tingi-pill:active {
-      border-color: var(--accent-green);
-      background: var(--accent-green-bg);
-    }
-
-    /* 6. Staple Speed Board Grid */
-    .speed-board-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
-    }
-
-    .product-tile {
-      background: var(--bg-card);
-      border: 2px solid var(--border-color);
-      border-radius: var(--radius-md);
-      min-height: 52px;
-      padding: 8px 10px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 6px;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .product-tile.in-basket {
-      border-color: var(--accent-green);
-      background: var(--accent-green-bg);
-    }
-
-    .tile-left {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      min-width: 0;
-    }
-
-    .tile-emoji {
-      font-size: 26px;
-      line-height: 1;
-      flex-shrink: 0;
-    }
-
-    .tile-info {
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-    }
-
-    .tile-name {
-      font-size: 13px;
-      font-weight: 800;
-      color: var(--text-primary);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .tile-price {
-      font-size: 13px;
-      font-weight: 900;
-      color: var(--accent-green);
-    }
-
-    .tile-badge {
-      background: var(--accent-green);
-      color: #ffffff;
-      font-size: 12px;
-      font-weight: 900;
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    /* 7. Action Drawer / Sticky Counter Bar */
-    .basket-counter-card {
-      background: var(--bg-card);
-      border: 2px solid var(--accent-green);
-      border-radius: var(--radius-lg);
-      padding: 12px 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      box-shadow: 0 4px 14px var(--accent-green-bg);
-    }
-
-    .basket-header-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .basket-items-preview {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text-muted);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 270px;
-    }
-
-    .btn-clear-basket {
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      font-size: 11px;
-      font-weight: 800;
-      text-decoration: underline;
-      cursor: pointer;
-      min-height: auto;
-    }
-
-    .basket-total-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .basket-total-label {
-      font-size: 14px;
-      font-weight: 800;
-      color: var(--text-primary);
-    }
-
-    .basket-total-amount {
-      font-size: 26px;
-      font-weight: 900;
-      color: var(--accent-green);
-    }
-
-    .btn-ilista {
-      background: var(--accent-green);
-      color: #ffffff;
-      border: none;
-      border-radius: var(--radius-md);
-      min-height: 52px;
-      font-size: 16px;
-      font-weight: 900;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      box-shadow: var(--shadow-md);
-    }
-
-    /* 8. Quick Repayment Row */
-    .quick-pay-card {
-      background: var(--bg-card);
-      border: 2px solid var(--border-color);
-      border-radius: var(--radius-lg);
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .pay-chips-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 6px;
-    }
-
-    .pay-chip {
-      background: var(--bg-card-alt);
-      border: 2px solid var(--border-color);
-      border-radius: var(--radius-sm);
-      min-height: 52px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-primary);
-      font-size: 13px;
-      font-weight: 900;
-    }
-
-    .pay-chip.full-pay {
-      background: var(--accent-green-bg);
-      border-color: var(--accent-green);
-      color: var(--accent-green);
-      font-size: 11px;
-      font-weight: 900;
-      text-align: center;
-      line-height: 1.1;
-      padding: 2px 4px;
-    }
-
-    /* 9. Recent Activity Drawer */
     .timeline-card {
       background: var(--bg-card);
       border: 2px solid var(--border-color);
@@ -961,7 +1022,48 @@
       flex-shrink: 0;
     }
 
-    /* 10. Full-Screen Sukli (Change) Modal (Bug 1.3 Resolution) */
+    /* Maya-Style Persistent 3-Tab Bottom Navigation Bar */
+    .bottom-nav-bar {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      height: var(--bottom-bar-height);
+      background: var(--bg-card);
+      border-top: 2px solid var(--border-color);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      z-index: 50;
+      box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.25);
+    }
+
+    .bottom-tab-btn {
+      background: transparent;
+      border: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 800;
+      padding: 6px 0;
+    }
+
+    .bottom-tab-btn .tab-icon {
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .bottom-tab-btn.active {
+      color: var(--accent-green);
+      background: var(--tab-active-bg);
+    }
+
+    /* Full-Screen Sukli Modal */
     .modal-backdrop {
       position: fixed;
       top: 0;
@@ -999,20 +1101,6 @@
     @keyframes modalScaleUp {
       from { transform: scale(0.92); opacity: 0; }
       to { transform: scale(1); opacity: 1; }
-    }
-
-    .sukli-header-title {
-      font-size: 16px;
-      font-weight: 800;
-      text-transform: uppercase;
-      color: var(--accent-green);
-      letter-spacing: 0.5px;
-    }
-
-    .sukli-cust-name {
-      font-size: 18px;
-      font-weight: 900;
-      color: var(--text-primary);
     }
 
     .sukli-giant-amount {
@@ -1095,7 +1183,7 @@
     <!-- Toast Notification Anchor -->
     <div id="toast-container" class="toast-container"></div>
 
-    <!-- 1. Header Bar -->
+    <!-- Header Bar -->
     <header class="app-header">
       <div class="brand-block">
         <span class="brand-icon">🏪</span>
@@ -1105,16 +1193,16 @@
         </div>
       </div>
       <div class="header-actions">
-        <!-- Sunlight-Proof Dual Mode Toggle Button -->
-        <button id="btn-theme-toggle" class="icon-btn touch-target" title="I-toggle ang Theme" aria-label="Toggle Theme">☀️</button>
-        <!-- Web Audio Mute/Unmute Toggle -->
-        <button id="btn-sound-toggle" class="icon-btn touch-target" title="Tunog" aria-label="Toggle Sound">🔊</button>
-        <!-- Restore Initial Mock Data -->
-        <button id="btn-reset-data" class="icon-btn touch-target" title="Reset Mock Data" aria-label="Reset Data">🔄</button>
+        <!-- Dual Mode Toggle (☀️ / 🌙) -->
+        <button id="btn-theme-toggle" class="icon-btn touch-target" title="Theme" aria-label="Toggle Theme">☀️</button>
+        <!-- Sound Toggle -->
+        <button id="btn-sound-toggle" class="icon-btn touch-target" title="Sound" aria-label="Toggle Sound">🔊</button>
+        <!-- Reset Data -->
+        <button id="btn-reset-data" class="icon-btn touch-target" title="Reset Data" aria-label="Reset Data">🔄</button>
       </div>
     </header>
 
-    <!-- Aggregated Counter Metric: Kabuuang Pautang -->
+    <!-- Counter Metric: Kabuuang Pautang -->
     <section class="metric-counter-banner">
       <div>
         <div class="metric-label">Kabuuang Pautang</div>
@@ -1126,82 +1214,21 @@
       </div>
     </section>
 
-    <!-- 2. Customer Selector Ribbon -->
+    <!-- Customer Selector Ribbon -->
     <section class="customer-ribbon-section">
       <div class="customer-scroll-row" id="customer-chips-row">
         <!-- Rendered via JS -->
       </div>
     </section>
 
-    <!-- 3. Customer Credit & Risk Card -->
-    <section class="customer-profile-card" id="customer-profile-card">
-      <div class="profile-top-row">
-        <div class="profile-info">
-          <h2 id="prof-cust-name">Aling Nena</h2>
-          <div class="profile-phone" id="prof-cust-phone">📱 0917-123-4567</div>
-        </div>
-        <div class="profile-debt-block">
-          <div class="profile-debt-amt" id="prof-cust-debt">₱320.00</div>
-          <div class="profile-limit-text" id="prof-cust-limit">Limit: ₱600.00</div>
-        </div>
-      </div>
-
-      <!-- Credit Progress Bar -->
-      <div class="credit-progress-bar">
-        <div id="credit-progress-fill" class="credit-progress-fill" style="width: 53%; background-color: var(--accent-amber);"></div>
-      </div>
-
-      <!-- AI-Style Rule-Based Advisory Banner -->
-      <div id="advisory-banner" class="advisory-banner advisory-watch">
-        <span id="advisory-icon">🟡</span>
-        <span id="advisory-text">Malapit na sa limit. Paalalahanan na mag-partial payment.</span>
-      </div>
-
-      <!-- 1-Tap "Kasunduan" SMS / Copy Summary Generator -->
-      <button id="btn-kasunduan" class="btn-kasunduan touch-target">
-        <span>📜</span> I-send ang Kasunduan (SMS / Copy)
-      </button>
-    </section>
-
-    <!-- 4. Interactive Mini Debt Calendar (Presbyopia Accessible) -->
-    <section class="calendar-container">
-      <div class="calendar-header-row">
-        <div class="cal-title-block">
-          <button id="btn-cal-prev" class="cal-nav-btn touch-target">◀</button>
-          <span id="cal-month-title">Oktubre 2026</span>
-          <button id="btn-cal-next" class="cal-nav-btn touch-target">▶</button>
-        </div>
-        <div id="pill-last-utang" class="last-utang-pill">Huling utang: 3 days ago</div>
-      </div>
-
-      <div class="cal-weekdays">
-        <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
-      </div>
-
-      <div class="cal-grid" id="calendar-grid">
-        <!-- 7-Column grid with 9px indicator dots rendered via JS -->
-      </div>
-
-      <!-- Date Details Popover -->
-      <div class="cal-inspect-popover" id="cal-inspect-popover">
-        <div class="inspect-header">
-          <span id="inspect-date-header">📅 Oktubre 18, 2026</span>
-          <span style="font-size: 10px; color: var(--accent-green); font-weight: 800;">Tap date to view</span>
-        </div>
-        <div id="inspect-content-list">
-          <!-- Populated via JS -->
-        </div>
-      </div>
-    </section>
-
-    <!-- Lower 60% Thumb Zone -->
-    <div class="thumb-zone">
-
-      <!-- 5. Micro-Credit "Tingi" Bar -->
-      <section class="tingi-bar-section">
-        <div class="section-headline">
-          <span>⚡ Bilis-Tingi (Unlisted Micro-Credit)</span>
-          <span style="font-size: 10px; color: var(--accent-green);">1-Tap Add</span>
+    <!-- ==================== TAB 1: BENTA (SPEED BOARD) ==================== -->
+    <main id="tab-benta" class="tab-pane active">
+      
+      <!-- Tingi Micro-Credit Bar -->
+      <section style="display: flex; flex-direction: column; gap: 6px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--text-muted);">
+          <span>⚡ Bilis-Tingi</span>
+          <span style="color: var(--accent-green);">1-Tap Add</span>
         </div>
         <div class="tingi-pill-row">
           <button class="tingi-pill touch-target btn-tingi-action" data-tingi="5">+₱5</button>
@@ -1211,18 +1238,17 @@
         </div>
       </section>
 
-      <!-- 6. Staple Speed Board Grid -->
+      <!-- 8 Staple Products Grid -->
       <section>
-        <div class="section-headline" style="margin-bottom: 6px;">
+        <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;">
           <span>📦 Pangunahing Paninda</span>
-          <span style="font-size: 10px; color: var(--accent-green);">8 Staple Tiles</span>
         </div>
         <div class="speed-board-grid" id="speed-board-grid">
           <!-- Rendered via JS -->
         </div>
       </section>
 
-      <!-- 7. Action Drawer / Sticky Counter Bar -->
+      <!-- Active Basket Floating Drawer -->
       <section class="basket-counter-card">
         <div class="basket-header-row">
           <div>
@@ -1240,11 +1266,19 @@
         </button>
       </section>
 
-      <!-- 8. Quick Repayment Row -->
-      <section class="quick-pay-card">
-        <div class="section-headline">
-          <span>💵 Mabilis na Bayad (Quick Pay)</span>
-          <span style="font-size: 10px;">Bawas Utang</span>
+    </main>
+
+    <!-- ==================== TAB 2: BAYAD (REPAYMENTS) ==================== -->
+    <main id="tab-bayad" class="tab-pane">
+
+      <!-- Outstanding Debt Summary Card -->
+      <section class="pay-card-section">
+        <div class="pay-target-title">Kasalukuyang Utang ni <span id="pay-summary-name" style="color: var(--text-primary);">Aling Nena</span></div>
+        <div class="pay-debt-big" id="pay-summary-debt">₱320.00</div>
+
+        <!-- Denomination Chips -->
+        <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); text-align: left;">
+          Pera / Denomination Presets:
         </div>
         <div class="pay-chips-grid">
           <button class="pay-chip touch-target btn-quick-pay" data-pay="20">₱20</button>
@@ -1255,24 +1289,130 @@
         </div>
       </section>
 
-      <!-- 9. Recent Activity Drawer -->
-      <section class="timeline-card">
-        <div class="section-headline">
-          <span>🕒 Kamakailang Talaan</span>
-          <span style="font-size: 10px;">Huling 4 na transaksyon</span>
+      <!-- Exact Tender Numpad -->
+      <section class="numpad-box">
+        <div class="numpad-screen">
+          <span class="numpad-screen-label">Ibinayad na Halaga:</span>
+          <span id="numpad-display-val" class="numpad-screen-val">₱0.00</span>
         </div>
-        <div class="timeline-list" id="timeline-list">
-          <!-- Rendered via JS -->
+        <div class="numpad-grid">
+          <button class="numpad-key touch-target" data-key="1">1</button>
+          <button class="numpad-key touch-target" data-key="2">2</button>
+          <button class="numpad-key touch-target" data-key="3">3</button>
+          <button class="numpad-key touch-target" data-key="4">4</button>
+          <button class="numpad-key touch-target" data-key="5">5</button>
+          <button class="numpad-key touch-target" data-key="6">6</button>
+          <button class="numpad-key touch-target" data-key="7">7</button>
+          <button class="numpad-key touch-target" data-key="8">8</button>
+          <button class="numpad-key touch-target" data-key="9">9</button>
+          <button class="numpad-key key-action touch-target" data-key="clear">C</button>
+          <button class="numpad-key touch-target" data-key="0">0</button>
+          <button class="numpad-key key-action touch-target" data-key="backspace">⌫</button>
+        </div>
+        <button id="btn-numpad-pay" class="btn-numpad-pay touch-target" disabled>
+          <span>💰</span> Tanggapin ang Bayad (₱0.00)
+        </button>
+      </section>
+
+    </main>
+
+    <!-- ==================== TAB 3: TALAAN (CALENDAR & AUDIT) ==================== -->
+    <main id="tab-talaan" class="tab-pane">
+
+      <!-- Customer Profile & Credit Risk Card -->
+      <section class="customer-profile-card">
+        <div class="profile-top-row">
+          <div class="profile-info">
+            <h2 id="prof-cust-name">Aling Nena</h2>
+            <div class="profile-phone" id="prof-cust-phone">📱 0917-123-4567</div>
+          </div>
+          <div class="profile-debt-block">
+            <div class="profile-debt-amt" id="prof-cust-debt">₱320.00</div>
+            <div class="profile-limit-text" id="prof-cust-limit">Limit: ₱600.00</div>
+          </div>
+        </div>
+
+        <!-- Credit Meter Progress Bar -->
+        <div class="credit-progress-bar">
+          <div id="credit-progress-fill" class="credit-progress-fill" style="width: 53%; background-color: var(--accent-amber);"></div>
+        </div>
+
+        <!-- AI Rule-Based Advisory Banner -->
+        <div id="advisory-banner" class="advisory-banner advisory-watch">
+          <span id="advisory-icon">🟡</span>
+          <span id="advisory-text">Malapit na sa limit. Paalalahanan na mag-partial payment.</span>
+        </div>
+
+        <!-- 1-Tap Kasunduan SMS Button -->
+        <button id="btn-kasunduan" class="btn-kasunduan touch-target">
+          <span>📜</span> I-send ang Kasunduan (SMS / Copy)
+        </button>
+      </section>
+
+      <!-- Interactive Mini Debt Calendar (9px Dots) -->
+      <section class="calendar-container">
+        <div class="calendar-header-row">
+          <div class="cal-title-block">
+            <button id="btn-cal-prev" class="cal-nav-btn touch-target">◀</button>
+            <span id="cal-month-title">Oktubre 2026</span>
+            <button id="btn-cal-next" class="cal-nav-btn touch-target">▶</button>
+          </div>
+          <div id="pill-last-utang" class="last-utang-pill">Huling utang: 3 days ago</div>
+        </div>
+
+        <div class="cal-weekdays">
+          <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
+        </div>
+
+        <div class="cal-grid" id="calendar-grid">
+          <!-- 7-column calendar grid injected via JS -->
+        </div>
+
+        <!-- Date Popover -->
+        <div class="cal-inspect-popover" id="cal-inspect-popover">
+          <div class="inspect-header">
+            <span id="inspect-date-header">📅 Oktubre 18, 2026</span>
+            <span style="font-size: 10px; color: var(--accent-green); font-weight: 800;">Tap date to view</span>
+          </div>
+          <div id="inspect-content-list">
+            <!-- Populated via JS -->
+          </div>
         </div>
       </section>
 
-    </div>
+      <!-- Recent Activity Feed -->
+      <section class="timeline-card">
+        <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--text-muted);">
+          <span>🕒 Kamakailang Talaan</span>
+        </div>
+        <div class="timeline-list" id="timeline-list">
+          <!-- Populated via JS -->
+        </div>
+      </section>
 
-    <!-- 10. Full-Screen Sukli (Change) Modal (Bug 1.3 Resolution) -->
+    </main>
+
+    <!-- Persistent 3-Tab Bottom Navigation Bar (Maya-Style) -->
+    <nav class="bottom-nav-bar">
+      <button class="bottom-tab-btn active touch-target" data-target="tab-benta">
+        <span class="tab-icon">⚡</span>
+        <span>Benta</span>
+      </button>
+      <button class="bottom-tab-btn touch-target" data-target="tab-bayad">
+        <span class="tab-icon">💵</span>
+        <span>Bayad</span>
+      </button>
+      <button class="bottom-tab-btn touch-target" data-target="tab-talaan">
+        <span class="tab-icon">📒</span>
+        <span>Talaan</span>
+      </button>
+    </nav>
+
+    <!-- Full-Screen Sukli Modal (Bug 1.3 Resolution) -->
     <div id="sukli-modal-backdrop" class="modal-backdrop">
       <div class="sukli-modal-card">
-        <div class="sukli-header-title">💵 Sukli Calculator</div>
-        <div class="sukli-cust-name" id="modal-sukli-cust">Aling Nena</div>
+        <div style="font-size: 14px; font-weight: 800; text-transform: uppercase; color: var(--accent-green);">💵 Sukli Calculator</div>
+        <div style="font-size: 18px; font-weight: 900; color: var(--text-primary);" id="modal-sukli-cust">Aling Nena</div>
         <div>
           <span style="font-size: 13px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Ibalik na Sukli:</span>
           <div class="sukli-giant-amount" id="modal-sukli-amount">₱65.00</div>
@@ -1295,11 +1435,12 @@
 
   <script>
     /**
-     * SariSync Speed Board - Production-Ready Digital Credit Ledger
-     * Fully self-contained, native web standards, zero dependencies
+     * SariSync Speed Board - Production Implementation
+     * Full dual-mode theme, persistent 3-tab navigation, synchronous debounce locks,
+     * and presbyopia-accessible interactive debt calendar.
      */
 
-    // 2. State Management & Exact Seed Schema
+    // Default Seed Schema
     const defaultState = {
       theme: "dark",
       selectedCustomerId: "c1",
@@ -1362,12 +1503,13 @@
     // Live State
     let appState = {};
     let soundEnabled = true;
+    let numpadTenderString = "0";
 
     // Calendar Navigation State
     let currentCalDate = new Date(2026, 9, 1); // Month 9 = October
     let selectedInspectedDate = "2026-10-18";
 
-    // 3.1 Date Progress Fallback Logic
+    // Date Progress Fallback Logic
     function getTodayIso() {
       const now = new Date();
       const y = now.getFullYear();
@@ -1396,7 +1538,7 @@
       return Number(Number(val).toFixed(2));
     }
 
-    // 3.2 Anti-Rapid-Tap Debounce Guard (Bug 1.1 Resolution)
+    // Synchronous Action-Lock Debounce Guard
     let isActionLocked = false;
     function withActionLock(fn, cooldown = 400) {
       return function(...args) {
@@ -1412,7 +1554,7 @@
       };
     }
 
-    // Web Audio Synthesizer (Native tactile sound)
+    // Web Audio Synthesizer
     let audioCtx = null;
     function getAudioContext() {
       if (!audioCtx) {
@@ -1480,7 +1622,7 @@
           osc.stop(now + 0.2);
         }
       } catch (e) {
-        console.warn("Audio feedback error:", e);
+        console.warn("Audio error", e);
       }
     }
 
@@ -1503,7 +1645,7 @@
 
     // State Persistence
     function loadState() {
-      const stored = localStorage.getItem("sarisync_speedboard_v2");
+      const stored = localStorage.getItem("sarisync_speedboard_v3");
       if (stored) {
         try {
           appState = JSON.parse(stored);
@@ -1525,18 +1667,19 @@
     }
 
     function saveState() {
-      localStorage.setItem("sarisync_speedboard_v2", JSON.stringify(appState));
+      localStorage.setItem("sarisync_speedboard_v3", JSON.stringify(appState));
     }
 
     function resetToFactorySeed() {
-      if (confirm("I-reset ang SariSync sa orihinal na talaan (Aling Nena, Mang Boy, Ate Joy)?")) {
+      if (confirm("I-reset ang SariSync sa panimulang talaan?")) {
         appState = JSON.parse(JSON.stringify(defaultState));
         currentCalDate = new Date(2026, 9, 1);
         selectedInspectedDate = "2026-10-18";
+        numpadTenderString = "0";
         saveState();
         applyTheme(appState.theme || "dark");
         renderAll();
-        showToast("Na-reset ang SariSync sa seed data!");
+        showToast("Na-reset ang data sa seed ledger!");
       }
     }
 
@@ -1563,7 +1706,7 @@
       showToast(newTheme === "light" ? "Naka-activate ang Sunlight Mode! ☀️" : "Naka-activate ang Dark Mode! 🌙");
     }
 
-    // 3.3 Dynamic "Tingi" Micro-Amount Injector & Product Basket Operations
+    // Speed Board Basket Operations
     function addProductToBasket(prodId) {
       playSound('tap');
       if (!appState.activeBasket.items[prodId]) {
@@ -1665,7 +1808,7 @@
       showToast(`Nailista: ₱${addedAmount.toFixed(2)} kay ${cust.name}!`, isOver ? "warning" : "success");
     }
 
-    // 3.4 Sukli (Change) Calculator & High-Contrast Modal (Bug 1.3 Resolution)
+    // Sukli & Quick Pay Logic
     function executeQuickPay(denomination) {
       const cust = getSelectedCustomer();
       if (!cust) return;
@@ -1682,18 +1825,15 @@
       }
       tendered = round2(tendered);
 
-      // Determine actual amount used to clear debt
       const bawasUtang = round2(Math.min(tendered, cust.totalDebt));
       const sukli = round2(Math.max(0, tendered - bawasUtang));
       const todayStr = getTodayIso();
 
-      // Update debt
       cust.totalDebt = round2(Math.max(0, cust.totalDebt - bawasUtang));
       if (cust.totalDebt === 0) {
         cust.daysOverdue = 0;
       }
 
-      // Append transaction record
       const newTx = {
         id: "tx_" + Date.now(),
         type: "payment",
@@ -1706,12 +1846,12 @@
       cust.history.unshift(newTx);
 
       selectedInspectedDate = todayStr;
+      numpadTenderString = "0";
       saveState();
       playSound('cash');
       renderAll();
 
       if (sukli > 0) {
-        // Show Full-Screen Sukli Modal
         displaySukliModal(cust.name, tendered, bawasUtang, sukli);
       } else {
         showToast(`Bayad natanggap: ₱${bawasUtang.toFixed(2)} kay ${cust.name}!`);
@@ -1731,7 +1871,41 @@
       document.getElementById("sukli-modal-backdrop").classList.remove("is-active");
     }
 
-    // 3.6 1-Tap "Kasunduan" SMS / Copy Summary Generator
+    // Numpad Logic for Custom Repayments
+    function handleNumpadKey(key) {
+      playSound('tap');
+      if (key === 'clear') {
+        numpadTenderString = "0";
+      } else if (key === 'backspace') {
+        if (numpadTenderString.length <= 1) {
+          numpadTenderString = "0";
+        } else {
+          numpadTenderString = numpadTenderString.slice(0, -1);
+        }
+      } else {
+        if (numpadTenderString === "0") {
+          numpadTenderString = key;
+        } else if (numpadTenderString.length < 6) {
+          numpadTenderString += key;
+        }
+      }
+      renderNumpad();
+    }
+
+    function renderNumpad() {
+      const val = Number(numpadTenderString) || 0;
+      document.getElementById("numpad-display-val").textContent = `₱${val.toFixed(2)}`;
+      const btn = document.getElementById("btn-numpad-pay");
+      if (val > 0) {
+        btn.disabled = false;
+        btn.innerHTML = `<span>💰</span> Tanggapin ang Bayad (₱${val.toFixed(2)})`;
+      } else {
+        btn.disabled = true;
+        btn.innerHTML = `<span>💰</span> Tanggapin ang Bayad (₱0.00)`;
+      }
+    }
+
+    // Kasunduan Generator
     function generateKasunduanText(cust) {
       const lastTx = (cust.history && cust.history[0]) 
         ? `${cust.history[0].type.toUpperCase()}: ₱${cust.history[0].amount.toFixed(2)} (${cust.history[0].items || cust.history[0].date})`
@@ -1746,14 +1920,11 @@
       playSound('tap');
       const text = generateKasunduanText(cust);
       
-      // Clipboard Copy
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(text).catch(() => {});
       }
-
       showToast("Nakopya sa clipboard ang Kasunduan!");
 
-      // Native SMS trigger
       const cleanPhone = cust.phone.replace(/[^0-9]/g, "");
       const encoded = encodeURIComponent(text);
       setTimeout(() => {
@@ -1848,13 +2019,11 @@
         debtEl.style.color = "var(--text-primary)";
       }
 
-      // Credit Progress Bar
       const percent = Math.min(100, Math.round((cust.totalDebt / cust.creditLimit) * 100));
       const fillBar = document.getElementById("credit-progress-fill");
       fillBar.style.width = `${percent}%`;
       fillBar.style.backgroundColor = status.type === "danger" ? "var(--accent-rose)" : status.type === "watch" ? "var(--accent-amber)" : "var(--accent-green)";
 
-      // Advisory Banner
       const banner = document.getElementById("advisory-banner");
       const icon = document.getElementById("advisory-icon");
       const text = document.getElementById("advisory-text");
@@ -1873,7 +2042,6 @@
         text.textContent = `Magandang suki! Maayos ang bayaran (${cust.repaymentRate}% repayment rate).`;
       }
 
-      // Last Borrowed Pill
       const lastUtang = (cust.history || []).find(h => h.type === "utang");
       const pill = document.getElementById("pill-last-utang");
       if (lastUtang) {
@@ -1891,6 +2059,10 @@
       } else {
         pill.textContent = "Walang nakaraang utang";
       }
+
+      // Also update Bayad Screen Summary
+      document.getElementById("pay-summary-name").textContent = cust.name;
+      document.getElementById("pay-summary-debt").textContent = `₱${cust.totalDebt.toFixed(2)}`;
     }
 
     function renderCalendar() {
@@ -1927,7 +2099,6 @@
 
         cell.className = `cal-cell touch-target ${isToday ? "is-today" : ""} ${isSelected ? "is-selected" : ""}`;
 
-        // Find transactions on this date
         const dayTxs = history.filter(t => t.date === dateStr);
         const hasUtang = dayTxs.some(t => t.type === "utang");
         const hasPayment = dayTxs.some(t => t.type === "payment");
@@ -2103,15 +2274,28 @@
       renderSpeedBoard();
       renderBasket();
       renderQuickPay();
+      renderNumpad();
       renderTimeline();
     }
 
-    // Event Listeners Binding (with Action Lock Guards)
+    // Event Listeners Binding
     function setupEventListeners() {
-      // Theme Toggle
+      // Bottom Navigation Tabs
+      document.querySelectorAll(".bottom-tab-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          playSound('tap');
+          const target = btn.getAttribute("data-target");
+          document.querySelectorAll(".bottom-tab-btn").forEach(b => b.classList.remove("active"));
+          document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active"));
+          btn.classList.add("active");
+          const targetPane = document.getElementById(target);
+          if (targetPane) targetPane.classList.add("active");
+        });
+      });
+
+      // Header Actions
       document.getElementById("btn-theme-toggle").addEventListener("click", toggleTheme);
 
-      // Sound Toggle
       const soundBtn = document.getElementById("btn-sound-toggle");
       soundBtn.addEventListener("click", () => {
         soundEnabled = !soundEnabled;
@@ -2119,13 +2303,12 @@
         if (soundEnabled) playSound('tap');
       });
 
-      // Reset Seed Data
       document.getElementById("btn-reset-data").addEventListener("click", resetToFactorySeed);
 
-      // Kasunduan SMS / Copy
+      // Kasunduan SMS
       document.getElementById("btn-kasunduan").addEventListener("click", sendKasunduan);
 
-      // Calendar Month Navigations
+      // Calendar Navigations
       document.getElementById("btn-cal-prev").addEventListener("click", () => {
         playSound('tap');
         currentCalDate.setMonth(currentCalDate.getMonth() - 1);
@@ -2165,6 +2348,23 @@
 
       // Dismiss Sukli Modal
       document.getElementById("btn-dismiss-sukli").addEventListener("click", dismissSukliModal);
+
+      // Numpad Keys
+      document.querySelectorAll(".numpad-key").forEach(keyBtn => {
+        keyBtn.addEventListener("click", () => {
+          const k = keyBtn.getAttribute("data-key");
+          handleNumpadKey(k);
+        });
+      });
+
+      // Numpad Tender Payment Submit (Action Locked)
+      const lockedNumpadPay = withActionLock(() => {
+        const val = Number(numpadTenderString);
+        if (val > 0) {
+          executeQuickPay(val);
+        }
+      }, 450);
+      document.getElementById("btn-numpad-pay").addEventListener("click", lockedNumpadPay);
     }
 
     // App Startup
