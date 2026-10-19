@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="tl-PH" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <!-- Fixes QA-001: Allows user pinch-to-zoom for WCAG 2.1 SC 1.4.4 accessibility -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SariSync Speed Board - Talaan, Benta &amp; Bayad</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div id="app-container">
+
+    <!-- Fixes QA-007: Toast Notification Anchor with aria-live="polite" -->
+    <div id="toast-container" class="toast-container" role="status" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- Header Bar -->
+    <header class="app-header">
+      <div class="brand-block">
+        <span class="brand-icon" aria-hidden="true">🏪</span>
+        <div class="brand-titles">
+          <div class="brand-name-row">
+            <span class="brand-name">SariSync</span>
+            <span id="sync-status-badge" class="sync-badge" title="Konektado sa Server Database">🟢 Live DB</span>
+          </div>
+          <span class="brand-sub">Speed Board POS &amp; Utang Ledger</span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <!-- Dual Mode Toggle (Daylight Default ☀️ / Night Mode 🌙) -->
+        <button id="btn-theme-toggle" class="icon-btn touch-target" type="button" title="Lumipat sa Dark Mode" aria-label="Toggle Daylight or Dark Theme">🌙</button>
+        <!-- Sound Toggle -->
+        <button id="btn-sound-toggle" class="icon-btn touch-target" type="button" title="Toggle Tunog" aria-label="Toggle Sound Effects">🔊</button>
+        <!-- Reset Seed Data -->
+        <button id="btn-reset-data" class="icon-btn touch-target" type="button" title="I-reset sa Factory Seed Data" aria-label="Reset Store Data">🔄</button>
+      </div>
+    </header>
+
+    <!-- ==========================================================================
+         TAB 1: 📒 TALAAN (CUSTOMER LEDGER, ADAPTIVE >5 LIST & PREDICTIVE RISK)
+         ========================================================================== -->
+    <main id="tab-talaan" class="tab-pane active" role="tabpanel" aria-labelledby="nav-tab-talaan">
+
+      <!-- Store Collectibles & Predictive Risk Tier Summary -->
+      <section class="collectibles-card" aria-label="Kabuuang Pautang ng Tindahan">
+        <div class="collectibles-top-row">
+          <div>
+            <div class="collectibles-label">Kabuuang Pautang (Collectibles)</div>
+            <div id="talaan-total-collectibles" class="collectibles-amount">₱0.00</div>
+          </div>
+          <div style="text-align: right;">
+            <span id="talaan-active-pill" class="suki-count-pill">6 Suki</span>
+          </div>
+        </div>
+        <div class="tier-summary-strip" aria-label="Buod ng Credit Risk">
+          <div class="tier-stat-chip">
+            <span>🟢 Safe</span>
+            <strong id="tier-safe-count">0</strong>
+          </div>
+          <div class="tier-stat-chip">
+            <span>🟡 Watch</span>
+            <strong id="tier-watch-count">0</strong>
+          </div>
+          <div class="tier-stat-chip">
+            <span>🔴 High Risk</span>
+            <strong id="tier-danger-count">0</strong>
+          </div>
+        </div>
+      </section>
+
+      <!-- Adaptive Customer Selector (>5 Threshold Transformation) -->
+      <section class="customer-ribbon-wrap" id="customer-selector-section" aria-label="Listahan ng mga Suki">
+        <div class="customer-header-bar">
+          <div>
+            <div class="section-title">
+              <span>Piliin ang Suki</span>
+            </div>
+            <div id="adaptive-mode-badge" style="font-size: 11px; font-weight: 800; color: var(--accent-green);">
+              ⚡ Adaptive Directory (&gt;5 Suki)
+            </div>
+          </div>
+          <button id="btn-open-add-suki" class="btn-add-suki touch-target" type="button">
+            <span aria-hidden="true">➕</span> Bagong Suki
+          </button>
+        </div>
+
+        <!-- Adaptive Search & Risk Filter Controls (Auto-activated when customers.length > 5) -->
+        <div id="adaptive-customer-controls" class="adaptive-controls is-visible">
+          <div class="search-input-wrap">
+            <span class="search-icon" aria-hidden="true">🔍</span>
+            <input
+              id="customer-search-input"
+              class="customer-search-input"
+              type="search"
+              placeholder="Hanapin ang pangalan o telepono ng Suki..."
+              aria-label="Hanapin ang Suki"
+              autocomplete="off"
+            >
+            <button id="btn-clear-search" class="btn-clear-search touch-target" type="button" aria-label="Burahin ang hinahanap">✕</button>
+          </div>
+          <div class="risk-filter-row" role="group" aria-label="I-filter ayon sa Risk Status">
+            <button class="risk-filter-pill touch-target active" type="button" data-risk-filter="all" id="filter-pill-all">Lahat (6)</button>
+            <button class="risk-filter-pill touch-target" type="button" data-risk-filter="safe" id="filter-pill-safe">🟢 Safe</button>
+            <button class="risk-filter-pill touch-target" type="button" data-risk-filter="watch" id="filter-pill-watch">🟡 Watch</button>
+            <button class="risk-filter-pill touch-target" type="button" data-risk-filter="danger" id="filter-pill-danger">🔴 Kritikal</button>
+          </div>
+        </div>
+
+        <div class="customer-scroll-row mode-adaptive" id="talaan-customer-chips" role="listbox" aria-label="Mga Suki Customers">
+          <!-- Rendered dynamically via app.js -->
+        </div>
+      </section>
+
+      <!-- Customer Overview & Predictive Risk Card -->
+      <section class="overview-card" aria-label="Detalye ng Napiling Suki">
+        <div class="overview-top-row">
+          <div class="overview-info">
+            <h2>
+              <span id="overview-cust-name">Aling Nena</span>
+              <span id="overview-risk-badge" class="risk-status-badge badge-watch">Watch</span>
+            </h2>
+            <div class="overview-phone" id="overview-cust-phone">📱 0917-123-4567</div>
+            <div class="overview-notes" id="overview-cust-notes"></div>
+          </div>
+          <div class="overview-debt-block">
+            <div class="overview-debt-amt" id="overview-cust-debt">₱320.00</div>
+            <div class="overview-limit-text" id="overview-cust-limit">Limit: ₱600.00</div>
+          </div>
+        </div>
+
+        <!-- Credit Limit Progress Bar -->
+        <div class="credit-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="53" id="overview-progress-bar">
+          <div id="overview-progress-fill" class="credit-progress-fill" style="width: 53%; background-color: var(--accent-amber-fill);"></div>
+        </div>
+
+        <!-- Overdue Status Pill & Repayment Rate -->
+        <div class="overview-metrics-row">
+          <div id="overview-last-utang-pill" class="last-utang-pill">Huling utang: Ngayong araw</div>
+          <div id="overview-rating-badge" style="font-size: 12px; font-weight: 900; color: var(--accent-green);">⭐ 92% Good Suki</div>
+        </div>
+
+        <!-- Predictive Credit Risk Advisory Banner -->
+        <div id="overview-warning-box" class="overview-warning-box" role="region" aria-live="polite"></div>
+
+        <!-- 1-Tap "I-send ang Kasunduan" (SMS/Copy) & Edit Credit Limit -->
+        <div class="overview-action-row">
+          <button id="btn-kasunduan" class="btn-kasunduan touch-target" type="button">
+            <span aria-hidden="true">📜</span> I-send ang Kasunduan (SMS / Copy)
+          </button>
+          <button id="btn-edit-limit" class="btn-edit-limit touch-target" type="button" title="Baguhin ang Credit Limit">
+            <span aria-hidden="true">⚙️</span> Limit
+          </button>
+        </div>
+      </section>
+
+      <!-- Interactive Mini Debt Calendar (9px Dots: Red Utang, Green Bayad, Split Both) -->
+      <section class="calendar-card" aria-label="Kalendaryo ng Utang at Bayad">
+        <div class="calendar-header-row">
+          <div class="cal-title-block">
+            <button id="btn-cal-prev" class="cal-nav-btn touch-target" type="button" aria-label="Nakaraang Buwan">◀</button>
+            <span id="cal-month-title">Oktubre 2026</span>
+            <button id="btn-cal-next" class="cal-nav-btn touch-target" type="button" aria-label="Susunod na Buwan">▶</button>
+          </div>
+          <span style="font-size: 10px; font-weight: 900; color: var(--text-muted); text-transform: uppercase;">🔴 Utang | 🟢 Bayad</span>
+        </div>
+
+        <div class="cal-weekdays" aria-hidden="true">
+          <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
+        </div>
+
+        <div class="cal-grid" id="calendar-grid">
+          <!-- 7-column calendar grid injected via app.js -->
+        </div>
+
+        <!-- Date Details Popover -->
+        <div class="cal-inspect-popover" id="cal-inspect-popover">
+          <div class="inspect-header">
+            <span id="inspect-date-header">📅 Oktubre 18, 2026</span>
+            <span style="font-size: 10px; color: var(--accent-green); font-weight: 900;">Pumili ng petsa</span>
+          </div>
+          <div id="inspect-content-list">
+            <!-- Populated via app.js -->
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ==========================================================================
+         TAB 2: ⚡ BENTA (SPEED BOARD POS, CUSTOM TINGI DRAWER & FLEXIBLE WARNING)
+         ========================================================================== -->
+    <main id="tab-benta" class="tab-pane" role="tabpanel" aria-labelledby="nav-tab-benta">
+
+      <!-- Active Customer Header (Fixes QA-005 Dynamic Risk Pill) -->
+      <section class="active-customer-header" aria-label="Kasalukuyang Suki sa Benta">
+        <div class="active-cust-tag">
+          <span aria-hidden="true">👤</span>
+          <span>Para kay: <strong id="benta-cust-name" style="color: var(--accent-green);">Aling Nena</strong></span>
+        </div>
+        <div class="active-cust-debt-pill pill-watch" id="benta-cust-debt-pill">
+          Utang: ₱320.00
+        </div>
+      </section>
+
+      <!-- Flexible Warning Mode Advisory Banner (Shown when Red or Projected Red/Watch) -->
+      <section id="benta-risk-banner" class="benta-risk-banner" role="region" aria-live="polite">
+        <div class="benta-risk-banner-header">
+          <span id="benta-risk-banner-title">⚠️ Babala sa Kritikal na Utang (Flexible Mode)</span>
+          <span>Hindi Naka-Block</span>
+        </div>
+        <div id="benta-risk-banner-text">
+          Lampas o malapit na sa credit limit ang Suki. Maaari pa ring ilista pagkatapos ng kumpirmasyon.
+        </div>
+      </section>
+
+      <!-- Bilis-Tingi Micro-Credit Bar + Custom Tingi Price Drawer -->
+      <section class="tingi-section-card" aria-label="Bilis-Tingi at Custom Tingi">
+        <div class="section-title">
+          <span>⚡ Bilis-Tingi (1-Tap Micro-Credit)</span>
+          <span style="color: var(--accent-green);">Pumili o Mag-Custom</span>
+        </div>
+        <div class="tingi-pill-row">
+          <button class="tingi-pill touch-target btn-tingi-action" type="button" data-tingi="1">+₱1</button>
+          <button class="tingi-pill touch-target btn-tingi-action" type="button" data-tingi="2">+₱2</button>
+          <button class="tingi-pill touch-target btn-tingi-action" type="button" data-tingi="5">+₱5</button>
+          <button class="tingi-pill touch-target btn-tingi-action" type="button" data-tingi="10">+₱10</button>
+          <button class="tingi-pill touch-target btn-tingi-action" type="button" data-tingi="15">+₱15</button>
+          <button class="tingi-pill touch-target btn-tingi-action" type="button" data-tingi="20">+₱20</button>
+          <button class="tingi-pill touch-target btn-tingi-action" type="button" data-tingi="50">+₱50</button>
+          <button id="btn-toggle-custom-tingi" class="tingi-pill btn-open-custom-tingi touch-target" type="button" aria-expanded="false" aria-controls="custom-tingi-drawer">
+            ✏️ Custom
+          </button>
+        </div>
+
+        <!-- Custom Tingi Price Drawer -->
+        <div id="custom-tingi-drawer" class="custom-tingi-drawer" role="region" aria-label="Custom Tingi Price Drawer">
+          <div class="section-title">
+            <span>🏷️ Custom Tingi Drawer (Pumili ng Paninda at Halaga)</span>
+          </div>
+          <div class="tingi-tag-chips" id="custom-tingi-tags">
+            <button type="button" class="tingi-tag-chip touch-target active" data-label="Yelo / Ice">🧊 Yelo</button>
+            <button type="button" class="tingi-tag-chip touch-target" data-label="Bawang / Sibuyas">🧄 Bawang/Sibuyas</button>
+            <button type="button" class="tingi-tag-chip touch-target" data-label="Asukal Tingi">🧂 Asukal Tingi</button>
+            <button type="button" class="tingi-tag-chip touch-target" data-label="Kendi / Chichirya">🍬 Kendi/Merienda</button>
+            <button type="button" class="tingi-tag-chip touch-target" data-label="Uling / Gas">🔥 Uling</button>
+            <button type="button" class="tingi-tag-chip touch-target" data-label="Tingi Paninda">🛍️ Iba Pa</button>
+          </div>
+          <div class="custom-tingi-inputs">
+            <input
+              id="custom-tingi-name"
+              class="form-input"
+              type="text"
+              value="Yelo / Ice"
+              placeholder="Pangalan ng Tingi"
+              aria-label="Pangalan ng Custom Tingi"
+            >
+            <input
+              id="custom-tingi-amount"
+              class="form-input"
+              type="number"
+              min="1"
+              step="0.5"
+              placeholder="Halaga (₱)"
+              aria-label="Halaga ng Custom Tingi sa Piso"
+            >
+            <button id="btn-add-custom-tingi" class="btn-add-custom-tingi touch-target" type="button">
+              + Add
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 12 Staple Product Speed Board -->
+      <section aria-label="Speed Board ng mga Pangunahing Paninda">
+        <div class="section-title" style="margin-bottom: 6px;">
+          <span>📦 Speed Board (12 Staple Products)</span>
+          <span>Tap = +1 | ➖ = Bawas</span>
+        </div>
+        <div class="speed-board-grid" id="speed-board-grid">
+          <!-- Rendered via app.js -->
+        </div>
+      </section>
+
+      <!-- Basket Counter & Commit Utang Card -->
+      <section class="basket-counter-card" aria-label="Kasalukuyang Basket ng Suki">
+        <div class="basket-header-row">
+          <div style="min-width: 0; flex: 1;">
+            <span style="font-size: 11px; font-weight: 900; text-transform: uppercase; color: var(--accent-green);">Basket ni <span id="basket-owner-label">Aling Nena</span>: </span>
+            <div id="basket-items-preview" class="basket-items-preview">Pumili ng paninda sa itaas</div>
+          </div>
+          <button id="btn-clear-basket" class="btn-clear-basket touch-target" type="button">Burahin</button>
+        </div>
+        <div class="basket-total-row">
+          <span class="basket-total-label">Kabuuang Halaga:</span>
+          <span id="basket-total-amount" class="basket-total-amount">₱0.00</span>
+        </div>
+        <button id="btn-ilista" class="btn-ilista touch-target" type="button" disabled>
+          <span aria-hidden="true">✍️</span> ILISTA (UTANG) ₱0.00
+        </button>
+      </section>
+
+    </main>
+
+    <!-- ==========================================================================
+         TAB 3: 💵 BAYAD (CASH, ZERO-FLOOR SUKLI CALCULATOR & AUDIT FEED)
+         ========================================================================== -->
+    <main id="tab-bayad" class="tab-pane" role="tabpanel" aria-labelledby="nav-tab-bayad">
+
+      <!-- Debt Summary & Quick Pay Card -->
+      <section class="pay-card-section" aria-label="Bayad at Sukli Calculator">
+        <div class="pay-target-title">
+          Kasalukuyang Utang ni <strong id="bayad-target-name" style="color: var(--text-primary);">Aling Nena</strong>
+        </div>
+        <div class="pay-debt-big" id="bayad-target-debt">₱320.00</div>
+        <div class="zero-floor-badge">🛡️ Zero-Floor Guard: Hindi bababa sa ₱0.00 ang balanse + Auto-Sukli</div>
+
+        <div class="section-title" style="margin-top: 4px;">
+          <span>💵 Inabot na Pera (1-Tap Quick Tender Bills)</span>
+        </div>
+        <!-- Quick Pay Tender Chips -->
+        <div class="pay-chips-grid">
+          <button class="pay-chip touch-target btn-quick-pay" type="button" data-pay="20">₱20</button>
+          <button class="pay-chip touch-target btn-quick-pay" type="button" data-pay="50">₱50</button>
+          <button class="pay-chip touch-target btn-quick-pay" type="button" data-pay="100">₱100</button>
+          <button class="pay-chip touch-target btn-quick-pay" type="button" data-pay="200">₱200</button>
+          <button class="pay-chip touch-target btn-quick-pay" type="button" data-pay="500">₱500</button>
+          <button class="pay-chip touch-target btn-quick-pay" type="button" data-pay="1000">₱1000</button>
+          <button class="pay-chip full-pay touch-target btn-quick-pay" type="button" data-pay="FULL" id="btn-pay-full">
+            ✅ Bayad Eksakto (Lahat)
+          </button>
+        </div>
+
+        <!-- Custom Cash Tender Input -->
+        <div class="custom-pay-row">
+          <input
+            id="custom-pay-amount"
+            class="form-input"
+            type="number"
+            min="1"
+            step="0.01"
+            placeholder="Ibang halaga ng binayad (₱)..."
+            aria-label="Ibang halaga ng binayad sa Piso"
+          >
+          <button id="btn-custom-pay" class="btn-custom-pay touch-target" type="button">
+            Tanggapin
+          </button>
+        </div>
+      </section>
+
+      <!-- Recent Activity Audit Feed -->
+      <section class="timeline-card" aria-label="Talaan ng Transaksyon">
+        <div class="section-title">
+          <span>🕒 Talaan ng Transaksyon (Audit Feed)</span>
+          <span id="bayad-audit-count" style="font-size: 10px;">Huling 5</span>
+        </div>
+        <div class="timeline-list" id="bayad-timeline-list">
+          <!-- Rendered via app.js -->
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ==========================================================================
+         Maya-Style Persistent 3-Tab Bottom Navigation Bar (Fixes QA-007 ARIA Roles)
+         ========================================================================== -->
+    <nav class="bottom-nav-bar" role="tablist" aria-label="SariSync Pangunahing Navigation">
+      <button
+        id="nav-tab-talaan"
+        class="bottom-tab-btn active touch-target"
+        type="button"
+        role="tab"
+        aria-selected="true"
+        aria-controls="tab-talaan"
+        data-target="tab-talaan"
+      >
+        <span class="tab-icon" aria-hidden="true">📒</span>
+        <span>Talaan</span>
+      </button>
+      <button
+        id="nav-tab-benta"
+        class="bottom-tab-btn touch-target"
+        type="button"
+        role="tab"
+        aria-selected="false"
+        aria-controls="tab-benta"
+        data-target="tab-benta"
+      >
+        <span class="tab-icon" aria-hidden="true">⚡</span>
+        <span>Benta</span>
+      </button>
+      <button
+        id="nav-tab-bayad"
+        class="bottom-tab-btn touch-target"
+        type="button"
+        role="tab"
+        aria-selected="false"
+        aria-controls="tab-bayad"
+        data-target="tab-bayad"
+      >
+        <span class="tab-icon" aria-hidden="true">💵</span>
+        <span>Bayad</span>
+      </button>
+    </nav>
+
+    <!-- ==========================================================================
+         MODAL 1: Full-Screen Sukli Calculator Modal (Fixes QA-007 Dialog Role)
+         ========================================================================== -->
+    <div
+      id="sukli-modal-backdrop"
+      class="modal-backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-sukli-heading"
+    >
+      <div class="sukli-modal-card">
+        <div id="modal-sukli-heading" style="font-size: 14px; font-weight: 900; text-transform: uppercase; color: var(--accent-green);">
+          💵 Sukli Calculator (Zero-Floor Guard)
+        </div>
+        <div style="font-size: 20px; font-weight: 900; color: var(--text-primary);" id="modal-sukli-cust">Aling Nena</div>
+        <div>
+          <span style="font-size: 13px; font-weight: 900; color: var(--text-muted); text-transform: uppercase;">Ibalik na Sukli sa Suki:</span>
+          <div class="sukli-giant-amount" id="modal-sukli-amount">₱65.00</div>
+        </div>
+        <div class="sukli-detail-row">
+          <span>Inabot na Pera:</span>
+          <span id="modal-tendered-amount" style="color: var(--text-primary);">₱100.00</span>
+        </div>
+        <div class="sukli-detail-row">
+          <span>Ibinawas sa Utang:</span>
+          <span id="modal-cleared-amount" style="color: var(--accent-green);">₱35.00</span>
+        </div>
+        <div class="sukli-detail-row">
+          <span>Natitirang Utang:</span>
+          <span id="modal-remaining-debt" style="color: var(--text-primary);">₱0.00</span>
+        </div>
+        <button id="btn-dismiss-sukli" class="btn-dismiss-sukli touch-target" type="button">
+          OK, NAIBIGAY NA ANG SUKLI
+        </button>
+      </div>
+    </div>
+
+    <!-- ==========================================================================
+         MODAL 2: Flexible Warning Mode Confirmation Modal (Red / Over-Limit Suki)
+         ========================================================================== -->
+    <div
+      id="warning-modal-backdrop"
+      class="modal-backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-warning-heading"
+    >
+      <div class="dialog-modal-card is-warning-dialog">
+        <div id="modal-warning-heading" style="font-size: 15px; font-weight: 900; text-transform: uppercase; color: var(--accent-rose);">
+          ⚠️ Babala sa Kritikal na Utang (Flexible Warning Mode)
+        </div>
+        <p id="modal-warning-message" style="font-size: 14px; font-weight: 800; color: var(--text-primary); line-height: 1.4;">
+          Ang bagong utang ay magpapalampas o nasa kritikal na antas ng credit limit.
+        </p>
+        <div style="background: var(--bg-card-alt); border: 1.5px solid var(--border-color); border-radius: var(--radius-sm); padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 800;">
+          <div style="display: flex; justify-content: space-between;">
+            <span>Kasalukuyang Utang:</span>
+            <strong id="modal-warn-prior">₱850.00</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span>Idaragdag na Basket:</span>
+            <strong id="modal-warn-added" style="color: var(--accent-rose);">+₱50.00</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--border-color); padding-top: 6px;">
+            <span>Magiging Kabuuang Utang:</span>
+            <strong id="modal-warn-projected" style="color: var(--accent-rose);">₱900.00</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span>Credit Limit ng Suki:</span>
+            <strong id="modal-warn-limit">₱800.00</strong>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <button id="btn-confirm-warning-override" class="btn-warning-override touch-target" type="button">
+            ✅ Oo, Ilista Pa Rin (Override Warning)
+          </button>
+          <button id="btn-cancel-warning" class="btn-secondary-modal touch-target" type="button">
+            Kanselahin Muna
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================================================
+         MODAL 3: Add New Suki / Edit Credit Limit Modal
+         ========================================================================== -->
+    <div
+      id="add-suki-modal-backdrop"
+      class="modal-backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-suki-heading"
+    >
+      <div class="dialog-modal-card">
+        <div id="modal-suki-heading" style="font-size: 16px; font-weight: 900; color: var(--text-primary);">
+          ➕ Magdagdag ng Bagong Suki
+        </div>
+        <div class="modal-form-group">
+          <label class="modal-form-label" for="input-suki-name">Pangalan ng Suki *</label>
+          <input id="input-suki-name" class="form-input" type="text" placeholder="Hal. Mang Tani" required>
+        </div>
+        <div class="modal-form-group">
+          <label class="modal-form-label" for="input-suki-phone">Cellphone Number</label>
+          <input id="input-suki-phone" class="form-input" type="tel" placeholder="Hal. 0917-555-0199">
+        </div>
+        <div class="modal-form-group">
+          <label class="modal-form-label" for="input-suki-limit">Credit Limit (₱) *</label>
+          <input id="input-suki-limit" class="form-input" type="number" min="50" step="50" value="500">
+        </div>
+        <div class="modal-form-group">
+          <label class="modal-form-label" for="input-suki-notes">Paalala / Notes</label>
+          <input id="input-suki-notes" class="form-input" type="text" placeholder="Hal. Nagbabayad tuwing Sabado">
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">
+          <button id="btn-save-suki" class="btn-primary-modal touch-target" type="button">
+            💾 I-Save ang Suki
+          </button>
+          <button id="btn-cancel-suki" class="btn-secondary-modal touch-target" type="button">
+            Isara
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,501 @@
+{
+  "metadata": {
+    "storeName": "SariSync Tindahan ni Aling Bebang",
+    "currency": "PHP",
+    "version": "2.0.0",
+    "lastUpdated": "2026-10-19T02:50:40.005Z"
+  },
+  "tingiPresets": [
+    1,
+    2,
+    5,
+    10,
+    15,
+    20,
+    50
+  ],
+  "quickPayPresets": [
+    20,
+    50,
+    100,
+    200,
+    500,
+    1000
+  ],
+  "products": [
+    {
+      "id": "p1",
+      "name": "3-in-1 Coffee",
+      "shortName": "Coffee",
+      "tagalog": "Kape Twin Pack",
+      "subtitle": "Kape Twin Pack",
+      "price": 15,
+      "category": "Inumin",
+      "icon": "☕",
+      "emoji": "☕"
+    },
+    {
+      "id": "p2",
+      "name": "Pancit Canton",
+      "shortName": "Canton",
+      "tagalog": "Chilimansi / Kalamansi",
+      "subtitle": "Chilimansi / Kalamansi",
+      "price": 18,
+      "category": "Merienda",
+      "icon": "🍜",
+      "emoji": "🍜"
+    },
+    {
+      "id": "p3",
+      "name": "Canned Sardines",
+      "shortName": "Sardines",
+      "tagalog": "Sardinas sa Lata",
+      "subtitle": "Sardinas sa Lata",
+      "price": 28,
+      "category": "Ulam",
+      "icon": "🐟",
+      "emoji": "🐟"
+    },
+    {
+      "id": "p4",
+      "name": "Egg (1 pc)",
+      "shortName": "Egg",
+      "tagalog": "Itlog (1 piraso)",
+      "subtitle": "Itlog (1 piraso)",
+      "price": 10,
+      "category": "Ulam",
+      "icon": "🥚",
+      "emoji": "🥚"
+    },
+    {
+      "id": "p5",
+      "name": "Rice 1kg",
+      "shortName": "Rice 1kg",
+      "tagalog": "Bigas Sinandomeng 1kg",
+      "subtitle": "Bigas Sinandomeng 1kg",
+      "price": 52,
+      "category": "Bigas",
+      "icon": "🍚",
+      "emoji": "🍚"
+    },
+    {
+      "id": "p6",
+      "name": "Cooking Oil Tingi",
+      "shortName": "Oil Tingi",
+      "tagalog": "Mantika Tingi Pouch",
+      "subtitle": "Mantika Tingi Pouch",
+      "price": 20,
+      "category": "Panluto",
+      "icon": "🫗",
+      "emoji": "🫗"
+    },
+    {
+      "id": "p7",
+      "name": "Instant Mami",
+      "shortName": "Mami",
+      "tagalog": "Beef / Chicken Noodles",
+      "subtitle": "Beef / Chicken Noodles",
+      "price": 14,
+      "category": "Merienda",
+      "icon": "🍲",
+      "emoji": "🍲"
+    },
+    {
+      "id": "p8",
+      "name": "Softdrinks",
+      "shortName": "Softdrinks",
+      "tagalog": "Malamig na Kasalo",
+      "subtitle": "Malamig na Kasalo",
+      "price": 25,
+      "category": "Inumin",
+      "icon": "🥤",
+      "emoji": "🥤"
+    },
+    {
+      "id": "p9",
+      "name": "Laundry Soap",
+      "shortName": "Sabon",
+      "tagalog": "Sabon Panlaba Sachet",
+      "subtitle": "Sabon Panlaba Sachet",
+      "price": 16,
+      "category": "Panlinis",
+      "icon": "🧼",
+      "emoji": "🧼"
+    },
+    {
+      "id": "p10",
+      "name": "Paracetamol",
+      "shortName": "Biogesic",
+      "tagalog": "Biogesic 500mg (1 tab)",
+      "subtitle": "Biogesic 500mg (1 tab)",
+      "price": 8,
+      "category": "Gamot",
+      "icon": "💊",
+      "emoji": "💊"
+    },
+    {
+      "id": "p11",
+      "name": "Sugar 1/4kg",
+      "shortName": "Asukal",
+      "tagalog": "Asukal na Pula 1/4kg",
+      "subtitle": "Asukal na Pula 1/4kg",
+      "price": 24,
+      "category": "Panluto",
+      "icon": "🧂",
+      "emoji": "🧂"
+    },
+    {
+      "id": "p12",
+      "name": "Toyo / Suka Pouch",
+      "shortName": "Toyo/Suka",
+      "tagalog": "Datu Puti Tingi Pouch",
+      "subtitle": "Datu Puti Tingi Pouch",
+      "price": 12,
+      "category": "Panluto",
+      "icon": "🍶",
+      "emoji": "🍶"
+    }
+  ],
+  "customers": [
+    {
+      "id": "c1",
+      "name": "Aling Nena",
+      "phone": "0917-123-4567",
+      "avatar": "👵",
+      "balance": 320,
+      "totalDebt": 320,
+      "creditLimit": 600,
+      "daysOverdue": 2,
+      "repaymentRate": 92,
+      "notes": "Suki sa kanto, laging nagbabayad tuwing Biyernes",
+      "createdAt": "2026-09-01T08:00:00.000Z"
+    },
+    {
+      "id": "c2",
+      "name": "Mang Boy",
+      "phone": "0928-555-8899",
+      "avatar": "👨",
+      "balance": 0,
+      "totalDebt": 0,
+      "creditLimit": 800,
+      "daysOverdue": 0,
+      "repaymentRate": 95,
+      "notes": "Tricycle driver, lampas na sa limit at 2 linggo nang walang bayad",
+      "createdAt": "2026-09-05T08:00:00.000Z"
+    },
+    {
+      "id": "c3",
+      "name": "Ate Joy",
+      "phone": "0919-888-2233",
+      "avatar": "👩",
+      "balance": 95,
+      "totalDebt": 95,
+      "creditLimit": 500,
+      "daysOverdue": 0,
+      "repaymentRate": 96,
+      "notes": "Maagang magbayad, laging kumukuha ng almusal",
+      "createdAt": "2026-09-10T08:00:00.000Z"
+    },
+    {
+      "id": "c4",
+      "name": "Kuya Jun",
+      "phone": "0918-444-7711",
+      "avatar": "👷",
+      "balance": 440,
+      "totalDebt": 440,
+      "creditLimit": 500,
+      "daysOverdue": 9,
+      "repaymentRate": 64,
+      "notes": "Construction foreman, sahod tuwing Sabado",
+      "createdAt": "2026-09-12T08:00:00.000Z"
+    },
+    {
+      "id": "c5",
+      "name": "Aling Rosa",
+      "phone": "0927-333-6644",
+      "avatar": "👩‍🍳",
+      "balance": 420,
+      "totalDebt": 420,
+      "creditLimit": 700,
+      "daysOverdue": 5,
+      "repaymentRate": 81,
+      "notes": "May karinderya sa tapat, kumukuha ng mantika at bigas",
+      "createdAt": "2026-09-15T08:00:00.000Z"
+    },
+    {
+      "id": "c6",
+      "name": "Ate Marites",
+      "phone": "0998-222-1100",
+      "avatar": "👱‍♀️",
+      "balance": 60,
+      "totalDebt": 60,
+      "creditLimit": 400,
+      "daysOverdue": 1,
+      "repaymentRate": 94,
+      "notes": "Mahilig sa kape at merienda sa hapon",
+      "createdAt": "2026-09-20T08:00:00.000Z"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "tx_1792378240004_22ad",
+      "customerId": "c2",
+      "customerName": "Mang Boy",
+      "type": "payment",
+      "amount": 850,
+      "tendered": 1000,
+      "tenderedAmount": 1000,
+      "deductedAmount": 850,
+      "sukli": 150,
+      "isOverpayment": true,
+      "items": "Cash payment",
+      "priorBalance": 850,
+      "newBalance": 0,
+      "date": "2026-10-19",
+      "timestamp": "2026-10-19T02:50:40.005Z"
+    },
+    {
+      "id": "tx_103",
+      "customerId": "c1",
+      "customerName": "Aling Nena",
+      "type": "utang",
+      "amount": 212,
+      "items": "2x Rice 1kg, 2x Canned Sardines, 2x Cooking Oil Tingi, 1x Toyo / Suka Pouch",
+      "itemList": [
+        {
+          "id": "p5",
+          "name": "Rice 1kg",
+          "qty": 2,
+          "price": 52,
+          "subtotal": 104
+        },
+        {
+          "id": "p3",
+          "name": "Canned Sardines",
+          "qty": 2,
+          "price": 28,
+          "subtotal": 56
+        },
+        {
+          "id": "p6",
+          "name": "Cooking Oil Tingi",
+          "qty": 2,
+          "price": 20,
+          "subtotal": 40
+        },
+        {
+          "id": "p12",
+          "name": "Toyo / Suka Pouch",
+          "qty": 1,
+          "price": 12,
+          "subtotal": 12
+        }
+      ],
+      "priorBalance": 108,
+      "newBalance": 320,
+      "date": "2026-10-18",
+      "timestamp": "2026-10-18T08:45:00.000Z"
+    },
+    {
+      "id": "tx_102",
+      "customerId": "c1",
+      "customerName": "Aling Nena",
+      "type": "payment",
+      "amount": 100,
+      "tendered": 100,
+      "deductedAmount": 100,
+      "sukli": 0,
+      "items": "Cash payment",
+      "priorBalance": 208,
+      "newBalance": 108,
+      "date": "2026-10-16",
+      "timestamp": "2026-10-16T17:15:00.000Z"
+    },
+    {
+      "id": "tx_101b",
+      "customerId": "c1",
+      "customerName": "Aling Nena",
+      "type": "utang",
+      "amount": 58,
+      "items": "2x 3-in-1 Coffee, 1x Canned Sardines",
+      "itemList": [
+        {
+          "id": "p1",
+          "name": "3-in-1 Coffee",
+          "qty": 2,
+          "price": 15,
+          "subtotal": 30
+        },
+        {
+          "id": "p3",
+          "name": "Canned Sardines",
+          "qty": 1,
+          "price": 28,
+          "subtotal": 28
+        }
+      ],
+      "priorBalance": 150,
+      "newBalance": 208,
+      "date": "2026-10-16",
+      "timestamp": "2026-10-16T07:30:00.000Z"
+    },
+    {
+      "id": "tx_101",
+      "customerId": "c1",
+      "customerName": "Aling Nena",
+      "type": "utang",
+      "amount": 150,
+      "items": "2x Rice 1kg, 3x Egg (1 pc), 1x Laundry Soap",
+      "itemList": [
+        {
+          "id": "p5",
+          "name": "Rice 1kg",
+          "qty": 2,
+          "price": 52,
+          "subtotal": 104
+        },
+        {
+          "id": "p4",
+          "name": "Egg (1 pc)",
+          "qty": 3,
+          "price": 10,
+          "subtotal": 30
+        },
+        {
+          "id": "p9",
+          "name": "Laundry Soap",
+          "qty": 1,
+          "price": 16,
+          "subtotal": 16
+        }
+      ],
+      "priorBalance": 0,
+      "newBalance": 150,
+      "date": "2026-10-14",
+      "timestamp": "2026-10-14T09:10:00.000Z"
+    },
+    {
+      "id": "tx_202",
+      "customerId": "c2",
+      "customerName": "Mang Boy",
+      "type": "utang",
+      "amount": 350,
+      "items": "5x Rice 1kg, 2x Softdrinks, 2x Cooking Oil Tingi",
+      "itemList": [
+        {
+          "id": "p5",
+          "name": "Rice 1kg",
+          "qty": 5,
+          "price": 52,
+          "subtotal": 260
+        },
+        {
+          "id": "p8",
+          "name": "Softdrinks",
+          "qty": 2,
+          "price": 25,
+          "subtotal": 50
+        },
+        {
+          "id": "p6",
+          "name": "Cooking Oil Tingi",
+          "qty": 2,
+          "price": 20,
+          "subtotal": 40
+        }
+      ],
+      "priorBalance": 500,
+      "newBalance": 850,
+      "warningAcknowledged": true,
+      "date": "2026-10-08",
+      "timestamp": "2026-10-08T18:20:00.000Z"
+    },
+    {
+      "id": "tx_201",
+      "customerId": "c2",
+      "customerName": "Mang Boy",
+      "type": "utang",
+      "amount": 500,
+      "items": "6x Rice 1kg, 4x Canned Sardines, 4x Pancit Canton, 1x Tingi (₱4)",
+      "priorBalance": 0,
+      "newBalance": 500,
+      "date": "2026-10-04",
+      "timestamp": "2026-10-04T11:00:00.000Z"
+    },
+    {
+      "id": "tx_301",
+      "customerId": "c3",
+      "customerName": "Ate Joy",
+      "type": "utang",
+      "amount": 95,
+      "items": "3x Egg (1 pc), 2x 3-in-1 Coffee, 1x Sugar 1/4kg, 1x Tingi (₱11)",
+      "priorBalance": 0,
+      "newBalance": 95,
+      "date": "2026-10-17",
+      "timestamp": "2026-10-17T06:50:00.000Z"
+    },
+    {
+      "id": "tx_402",
+      "customerId": "c4",
+      "customerName": "Kuya Jun",
+      "type": "utang",
+      "amount": 190,
+      "items": "2x Rice 1kg, 3x Pancit Canton, 2x Paracetamol, 1x Tingi (₱16)",
+      "priorBalance": 250,
+      "newBalance": 440,
+      "date": "2026-10-13",
+      "timestamp": "2026-10-13T19:05:00.000Z"
+    },
+    {
+      "id": "tx_401",
+      "customerId": "c4",
+      "customerName": "Kuya Jun",
+      "type": "utang",
+      "amount": 250,
+      "items": "3x Rice 1kg, 2x Canned Sardines, 2x Softdrinks",
+      "priorBalance": 0,
+      "newBalance": 250,
+      "date": "2026-10-09",
+      "timestamp": "2026-10-09T18:40:00.000Z"
+    },
+    {
+      "id": "tx_502",
+      "customerId": "c5",
+      "customerName": "Aling Rosa",
+      "type": "payment",
+      "amount": 100,
+      "tendered": 100,
+      "deductedAmount": 100,
+      "sukli": 0,
+      "items": "Cash payment",
+      "priorBalance": 520,
+      "newBalance": 420,
+      "date": "2026-10-15",
+      "timestamp": "2026-10-15T15:00:00.000Z"
+    },
+    {
+      "id": "tx_501",
+      "customerId": "c5",
+      "customerName": "Aling Rosa",
+      "type": "utang",
+      "amount": 520,
+      "items": "6x Rice 1kg, 6x Cooking Oil Tingi, 4x Toyo / Suka Pouch, 2x Sugar 1/4kg",
+      "priorBalance": 0,
+      "newBalance": 520,
+      "date": "2026-10-12",
+      "timestamp": "2026-10-12T05:45:00.000Z"
+    },
+    {
+      "id": "tx_601",
+      "customerId": "c6",
+      "customerName": "Ate Marites",
+      "type": "utang",
+      "amount": 60,
+      "items": "2x 3-in-1 Coffee, 1x Pancit Canton, 1x Toyo / Suka Pouch",
+      "priorBalance": 0,
+      "newBalance": 60,
+      "date": "2026-10-18",
+      "timestamp": "2026-10-18T14:20:00.000Z"
+    }
+  ]
+}

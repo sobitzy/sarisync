@@ -1,0 +1,24 @@
+{
+  "name": "sarisync-app",
+  "version": "1.0.0",
+  "description": "SariSync Speed Board - Offline-Resilient Sari-Sari Store POS, Talaan Credit Ledger, and Predictive Credit Risk Engine",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test"
+  },
+  "keywords": [
+    "sari-sari",
+    "pos",
+    "utang",
+    "talaan",
+    "fintech",
+    "philippines",
+    "credit-risk"
+  ],
+  "author": "SariSync Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
