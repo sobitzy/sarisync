@@ -37,7 +37,69 @@
     </header>
 
     <!-- ==========================================================================
-         TAB 1: 📒 TALAAN (CUSTOMER LEDGER, ADAPTIVE >5 LIST & PREDICTIVE RISK)
+         TAB 1: 📦 PANINDA (INVENTORY PRODUCTS CRUD & STOCK TRACKING)
+         ========================================================================== -->
+    <main id="tab-paninda" class="tab-pane" role="tabpanel" aria-labelledby="nav-tab-paninda">
+
+      <!-- Inventory Summary Header Card -->
+      <section class="collectibles-card" aria-label="Buod ng Imbentaryo">
+        <div class="collectibles-top-row">
+          <div>
+            <div class="collectibles-label">Kabuuang Paninda (Inventory)</div>
+            <div id="paninda-total-count" class="collectibles-amount">12 Paninda</div>
+          </div>
+          <button id="btn-open-add-product" class="btn-add-suki touch-target" type="button">
+            <span aria-hidden="true">➕</span> Bagong Paninda
+          </button>
+        </div>
+        <div class="tier-summary-strip" aria-label="Buod ng Stock">
+          <div class="tier-stat-chip">
+            <span>📦 Sa Stock:</span>
+            <strong id="paninda-in-stock-count">12</strong>
+          </div>
+          <div class="tier-stat-chip">
+            <span>⚠️ Mababang Stock (&le;5):</span>
+            <strong id="paninda-low-stock-count" style="color: var(--accent-rose);">0</strong>
+          </div>
+        </div>
+      </section>
+
+      <!-- Products Search Bar & Category Filters -->
+      <section class="customer-ribbon-wrap" aria-label="Paghahanap ng Paninda">
+        <div class="search-input-wrap">
+          <span class="search-icon" aria-hidden="true">🔍</span>
+          <input
+            id="product-search-input"
+            class="customer-search-input"
+            type="search"
+            placeholder="Hanapin ang paninda sa imbentaryo..."
+            aria-label="Hanapin ang paninda"
+            autocomplete="off"
+          >
+          <button id="btn-clear-prod-search" class="btn-clear-search touch-target" type="button" aria-label="Burahin ang hinahanap">✕</button>
+        </div>
+        <div class="risk-filter-row" role="group" aria-label="Kategorya ng Paninda" id="prod-category-filter-row">
+          <button class="risk-filter-pill touch-target active" type="button" data-prod-cat="all">Lahat</button>
+          <button class="risk-filter-pill touch-target" type="button" data-prod-cat="Inumin">Inumin</button>
+          <button class="risk-filter-pill touch-target" type="button" data-prod-cat="Merienda">Merienda</button>
+          <button class="risk-filter-pill touch-target" type="button" data-prod-cat="Ulam">Ulam</button>
+          <button class="risk-filter-pill touch-target" type="button" data-prod-cat="Bigas">Bigas</button>
+          <button class="risk-filter-pill touch-target" type="button" data-prod-cat="Panluto">Panluto</button>
+          <button class="risk-filter-pill touch-target" type="button" data-prod-cat="low-stock">⚠️ Low Stock</button>
+        </div>
+      </section>
+
+      <!-- Products Inventory Table / Cards Container -->
+      <section class="products-list-wrap" aria-label="Talaan ng mga Paninda">
+        <div class="products-grid-list" id="products-inventory-list">
+          <!-- Populated dynamically via app.js -->
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ==========================================================================
+         TAB 2: 👥 SUKI (CUSTOMER LEDGER, ADAPTIVE >5 LIST & BANKACCOUNT UTANG)
          ========================================================================== -->
     <main id="tab-talaan" class="tab-pane active" role="tabpanel" aria-labelledby="nav-tab-talaan">
 
@@ -149,6 +211,15 @@
           </button>
           <button id="btn-edit-limit" class="btn-edit-limit touch-target" type="button" title="Baguhin ang Credit Limit">
             <span aria-hidden="true">⚙️</span> Limit
+          </button>
+        </div>
+
+        <div class="suki-card-actions">
+          <button id="btn-customer-add-utang" class="btn-customer-add-utang touch-target" type="button">
+            <span aria-hidden="true">✍️</span> Maglista ng Utang
+          </button>
+          <button id="btn-customer-pay" class="btn-customer-pay touch-target" type="button">
+            <span aria-hidden="true">💵</span> Magbayad (Bayad Tab)
           </button>
         </div>
       </section>
@@ -361,9 +432,21 @@
     </main>
 
     <!-- ==========================================================================
-         Maya-Style Persistent 3-Tab Bottom Navigation Bar (Fixes QA-007 ARIA Roles)
+         4-Tab Bottom Navigation Bar: Paninda, Suki, Benta, Bayad
          ========================================================================== -->
     <nav class="bottom-nav-bar" role="tablist" aria-label="SariSync Pangunahing Navigation">
+      <button
+        id="nav-tab-paninda"
+        class="bottom-tab-btn touch-target"
+        type="button"
+        role="tab"
+        aria-selected="false"
+        aria-controls="tab-paninda"
+        data-target="tab-paninda"
+      >
+        <span class="tab-icon" aria-hidden="true">📦</span>
+        <span>Paninda</span>
+      </button>
       <button
         id="nav-tab-talaan"
         class="bottom-tab-btn active touch-target"
@@ -373,8 +456,8 @@
         aria-controls="tab-talaan"
         data-target="tab-talaan"
       >
-        <span class="tab-icon" aria-hidden="true">📒</span>
-        <span>Talaan</span>
+        <span class="tab-icon" aria-hidden="true">👥</span>
+        <span>Suki</span>
       </button>
       <button
         id="nav-tab-benta"
@@ -521,6 +604,100 @@
           </button>
           <button id="btn-cancel-suki" class="btn-secondary-modal touch-target" type="button">
             Isara
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================================================
+         MODAL 4: Add / Edit Paninda (Inventory Product) Modal
+         ========================================================================== -->
+    <div
+      id="product-modal-backdrop"
+      class="modal-backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-product-heading"
+    >
+      <div class="dialog-modal-card">
+        <div id="modal-product-heading" style="font-size: 16px; font-weight: 900; color: var(--text-primary);">
+          📦 Magdagdag ng Bagong Paninda
+        </div>
+        <input type="hidden" id="input-product-id" value="">
+        <div class="modal-form-group">
+          <label class="modal-form-label" for="input-product-name">Pangalan ng Paninda *</label>
+          <input id="input-product-name" class="form-input" type="text" placeholder="Hal. Bigas Sinandomeng 1kg" required>
+        </div>
+        <div class="modal-form-group">
+          <label class="modal-form-label" for="input-product-category">Kategorya</label>
+          <select id="input-product-category" class="form-input">
+            <option value="Inumin">Inumin</option>
+            <option value="Merienda">Merienda</option>
+            <option value="Ulam">Ulam</option>
+            <option value="Bigas">Bigas</option>
+            <option value="Panluto">Panluto</option>
+            <option value="Panlinis">Panlinis</option>
+            <option value="Gamot">Gamot</option>
+            <option value="Iba Pa">Iba Pa</option>
+          </select>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+          <div class="modal-form-group">
+            <label class="modal-form-label" for="input-product-price">Presyo sa Tindahan (₱) *</label>
+            <input id="input-product-price" class="form-input" type="number" min="0.5" step="0.5" placeholder="52.00" required>
+          </div>
+          <div class="modal-form-group">
+            <label class="modal-form-label" for="input-product-cost">Puhunan / Cost (₱)</label>
+            <input id="input-product-cost" class="form-input" type="number" min="0" step="0.5" placeholder="44.00">
+          </div>
+        </div>
+        <div class="modal-form-group">
+          <label class="modal-form-label" for="input-product-stock">Bilang ng Stock (Piraso) *</label>
+          <input id="input-product-stock" class="form-input" type="number" min="0" step="1" value="20" required>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">
+          <button id="btn-save-product" class="btn-primary-modal touch-target" type="button">
+            💾 I-Save ang Paninda
+          </button>
+          <button id="btn-cancel-product" class="btn-secondary-modal touch-target" type="button">
+            Isara
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================================================
+         MODAL 5: Quick Add Utang Modal (BankAccount-Style Charge)
+         ========================================================================== -->
+    <div
+      id="quick-utang-modal-backdrop"
+      class="modal-backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-quick-utang-heading"
+    >
+      <div class="dialog-modal-card">
+        <div id="modal-quick-utang-heading" style="font-size: 16px; font-weight: 900; color: var(--accent-rose);">
+          ✍️ Maglista ng Utang (Credit Purchase)
+        </div>
+        <p style="font-size: 13px; font-weight: 800; color: var(--text-muted);">
+          Para kay: <strong id="quick-utang-cust-name" style="color: var(--text-primary);">Aling Nena</strong>
+        </p>
+        <input type="hidden" id="quick-utang-cust-id" value="">
+        <div class="modal-form-group">
+          <label class="modal-form-label" for="input-quick-utang-amount">Halaga ng Utang (₱) *</label>
+          <input id="input-quick-utang-amount" class="form-input" type="number" min="1" step="0.5" placeholder="Hal. 150.00" required>
+        </div>
+        <div class="modal-form-group">
+          <label class="modal-form-label" for="input-quick-utang-notes">Mga Kinuha / Deskripsyon</label>
+          <input id="input-quick-utang-notes" class="form-input" type="text" placeholder="Hal. 2x Kape, 1x Sardinas">
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">
+          <button id="btn-submit-quick-utang" class="btn-warning-override touch-target" type="button">
+            ✍️ Ilista sa Utang
+          </button>
+          <button id="btn-cancel-quick-utang" class="btn-secondary-modal touch-target" type="button">
+            Kanselahin
           </button>
         </div>
       </div>

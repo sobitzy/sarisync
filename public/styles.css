@@ -1602,7 +1602,7 @@ button:disabled,
   background: var(--bg-card);
   border-top: 2px solid var(--border-color);
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   z-index: 50;
   box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.2);
 }
@@ -1795,3 +1795,290 @@ button:disabled,
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* ==========================================================================
+   PANINDA (PRODUCTS INVENTORY) & SUKI BANKACCOUNT BADGES & ACTIONS
+   ========================================================================== */
+
+.products-list-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.products-grid-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.product-card-item {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.2s ease, transform 0.1s ease;
+}
+
+.product-card-item:hover {
+  border-color: var(--accent-green-border);
+}
+
+.product-card-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.product-card-icon {
+  font-size: 26px;
+  width: 44px;
+  height: 44px;
+  background: var(--cell-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.product-card-details {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.product-card-title {
+  font-size: 15px;
+  font-weight: 900;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.product-card-sub {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.product-card-pricing {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.product-price-tag {
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--accent-green);
+}
+
+.product-cost-tag {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.product-card-stock {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.stock-pill {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--accent-green-bg);
+  color: var(--accent-green-strong);
+  border: 1px solid var(--accent-green-border);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.stock-pill.is-low-stock {
+  background: var(--accent-rose-bg);
+  color: var(--accent-rose);
+  border-color: var(--accent-rose-border);
+}
+
+.product-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-action-small {
+  background: var(--bg-card-alt);
+  border: 1.5px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 900;
+  padding: 6px 10px;
+  min-height: 44px;
+  min-width: 44px;
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.btn-action-small:hover {
+  background: var(--cell-hover);
+}
+
+.btn-action-delete {
+  color: var(--accent-rose);
+  border-color: var(--accent-rose-border);
+}
+
+/* Suki BankAccount Balance Badges & Action Buttons */
+.suki-balance-badge {
+  font-size: 13px;
+  font-weight: 900;
+  padding: 4px 10px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  letter-spacing: -0.2px;
+}
+
+.suki-balance-badge.is-settled {
+  background: #dcfce7;
+  color: #16a34a;
+  border: 1.5px solid #16a34a;
+}
+
+.suki-balance-badge.has-debt {
+  background: var(--accent-rose-bg);
+  color: #dc2626;
+  border: 1.5px solid #dc2626;
+}
+
+.suki-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-customer-add-utang {
+  background: var(--accent-rose-bg);
+  border: 1.5px solid var(--accent-rose-border);
+  color: var(--accent-rose);
+  font-size: 12px;
+  font-weight: 900;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.btn-customer-pay {
+  background: var(--btn-green-bg);
+  color: var(--btn-green-text);
+  border: 1.5px solid transparent;
+  font-size: 12px;
+  font-weight: 900;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+/* Empty State Box */
+.empty-state-card {
+  background: var(--bg-card);
+  border: 2px dashed var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 32px 16px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+}
+
+.empty-state-icon {
+  font-size: 38px;
+  line-height: 1;
+}
+
+.empty-state-title {
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--text-primary);
+}
+
+/* Responsive Desktop Layout (>= 768px & >= 1024px) */
+@media (min-width: 768px) {
+  #app-container {
+    max-width: 960px;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .bottom-nav-bar {
+    max-width: 960px;
+  }
+
+  .products-grid-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .customer-scroll-row.mode-adaptive {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .speed-board-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  #app-container {
+    max-width: 1080px;
+  }
+
+  .bottom-nav-bar {
+    max-width: 1080px;
+  }
+
+  .products-grid-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .customer-scroll-row.mode-adaptive {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+

@@ -369,4 +369,174 @@ describe("SariSync Speed Board — End-to-End QA & Reliability Suite", () => {
     assert.equal(resetRes.body.customers.length, 6);
     assert.equal(resetRes.body.summary.totalCollectibles, 2185);
   });
+
+  // ==========================================================================
+  // 11. BANKACCOUNT-STYLE UTANGACCOUNT MODEL VERIFICATION
+  // ==========================================================================
+  test("11. UtangAccount behaves exactly like Java BankAccount with deposit(), addUtang(), and exact arithmetic", () => {
+    const UtangAccount = require("../models/UtangAccount");
+    const account = new UtangAccount({
+      id: "test_c1",
+      name: "Aling Bebang",
+      balance: 100.0,
+      creditLimit: 500.0
+    });
+
+    assert.equal(account.getBalance(), 100.0);
+
+    // addUtang / charge increases balance
+    const chargeRes = account.addUtang(50.25, "1x Bigas 1kg");
+    assert.equal(chargeRes.addedAmount, 50.25);
+    assert.equal(chargeRes.newDebt, 150.25);
+    assert.equal(account.getBalance(), 150.25);
+
+    // charge alias works identically
+    account.charge(20.0, "Kape");
+    assert.equal(account.getBalance(), 170.25);
+
+    // deposit / payUtang decreases balance
+    const payRes = account.deposit(70.25, "Partial payment");
+    assert.equal(payRes.deductedAmount, 70.25);
+    assert.equal(payRes.remainingDebt, 100.0);
+    assert.equal(payRes.sukli, 0);
+    assert.equal(account.getBalance(), 100.0);
+
+    // deposit with overpayment clamps to 0.00 and computes exact sukli
+    const overpayRes = account.deposit(120.0, "Full payment with extra");
+    assert.equal(overpayRes.deductedAmount, 100.0);
+    assert.equal(overpayRes.remainingDebt, 0.0);
+    assert.equal(overpayRes.sukli, 20.0);
+    assert.equal(overpayRes.isOverpayment, true);
+    assert.equal(account.getBalance(), 0.0);
+
+    // Invalid input rejection
+    assert.throws(() => account.deposit(0), /Amount must be a positive number/);
+    assert.throws(() => account.deposit(-10), /Amount must be a positive number/);
+    assert.throws(() => account.deposit("invalid"), /Amount must be a positive number/);
+    assert.throws(() => account.deposit(NaN), /Amount must be a positive number/);
+    assert.throws(() => account.deposit(null), /Amount must be a positive number/);
+    assert.throws(() => account.addUtang(-5), /Amount must be a positive number/);
+  });
+
+  // ==========================================================================
+  // 12. PRODUCTS INVENTORY CRUD & STOCK TRACKING
+  // ==========================================================================
+  test("12. Products Inventory CRUD endpoints support Add, Read, Edit, and Delete with stock quantities", async () => {
+    // 1. List products
+    const listRes = await invokeAppRequest("GET", "/api/products");
+    assert.equal(listRes.statusCode, 200);
+    const initialCount = listRes.body.count;
+
+    // 2. Add product
+    const addRes = await invokeAppRequest("POST", "/api/products", {
+      name: "Tsinelas Beach Walk",
+      shortName: "Tsinelas",
+      tagalog: "Pambahay na Tsinelas",
+      price: 85.0,
+      cost: 60.0,
+      stock: 15,
+      category: "Iba Pa"
+    });
+    assert.equal(addRes.statusCode, 201);
+    assert.equal(addRes.body.product.name, "Tsinelas Beach Walk");
+    assert.equal(addRes.body.product.stock, 15);
+    const createdId = addRes.body.product.id;
+
+    // 3. Update product
+    const updateRes = await invokeAppRequest("PUT", `/api/products/${createdId}`, {
+      price: 90.0,
+      stock: 20
+    });
+    assert.equal(updateRes.statusCode, 200);
+    assert.equal(updateRes.body.product.price, 90.0);
+    assert.equal(updateRes.body.product.stock, 20);
+
+    // 4. Delete product
+    const deleteRes = await invokeAppRequest("DELETE", `/api/products/${createdId}`);
+    assert.equal(deleteRes.statusCode, 200);
+
+    const afterList = await invokeAppRequest("GET", "/api/products");
+    assert.equal(afterList.body.count, initialCount);
+  });
+
+  // ==========================================================================
+  // 13. SALES POS CHECKOUT, STOCK DEDUCTION & OUT-OF-STOCK GUARD
+  // ==========================================================================
+  test("13. Sales POS records Cash and Utang sales, deducts stock, and rejects insufficient stock", async () => {
+    // Check initial stock of Coffee (p1)
+    const prodRes = await invokeAppRequest("GET", "/api/products/p1");
+    assert.equal(prodRes.statusCode, 200);
+    const initialStock = prodRes.body.product.stock;
+
+    // 1. Cash Sale
+    const cashSale = await invokeAppRequest("POST", "/api/sales", {
+      items: [{ productId: "p1", qty: 2 }],
+      paymentType: "cash",
+      tenderedAmount: 50.0
+    });
+    assert.equal(cashSale.statusCode, 201);
+    assert.equal(cashSale.body.sale.amount, 30.0); // 2 * 15
+
+    // Verify stock was reduced by 2
+    const afterCash = await invokeAppRequest("GET", "/api/products/p1");
+    assert.equal(afterCash.body.product.stock, initialStock - 2);
+
+    // 2. Out-of-stock guard: requesting 9999 units should be rejected with 400
+    const outOfStock = await invokeAppRequest("POST", "/api/sales", {
+      items: [{ productId: "p1", qty: 9999 }],
+      paymentType: "cash"
+    });
+    assert.equal(outOfStock.statusCode, 400);
+    assert.ok(outOfStock.body.error.includes("Kulang ang stock"));
+
+    // 3. Utang Sale for Ate Joy (c3)
+    const joyBefore = await invokeAppRequest("GET", "/api/customers/c3");
+    const joyPriorDebt = joyBefore.body.customer.balance;
+
+    const utangSale = await invokeAppRequest("POST", "/api/sales", {
+      items: [{ productId: "p1", qty: 1 }],
+      paymentType: "utang",
+      customerId: "c3"
+    });
+    assert.equal(utangSale.statusCode, 201);
+    assert.equal(utangSale.body.customer.balance, joyPriorDebt + 15.0);
+
+    // 4. Void sale restores stock
+    const voidRes = await invokeAppRequest("DELETE", `/api/sales/${cashSale.body.sale.id}`);
+    assert.equal(voidRes.statusCode, 200);
+    const afterVoid = await invokeAppRequest("GET", "/api/products/p1");
+    // Restored 2 from the voided cash sale (initialStock - 2 - 1 + 2 = initialStock - 1)
+    assert.equal(afterVoid.body.product.stock, initialStock - 1);
+  });
+
+  // ==========================================================================
+  // 14. CUSTOMER UTANG DELETION GUARD
+  // ==========================================================================
+  test("14. DELETE /api/customers/:id rejects deletion of customer with active debt", async () => {
+    // Aling Nena (c1) has active utang (₱320+)
+    const delReject = await invokeAppRequest("DELETE", "/api/customers/c1");
+    assert.equal(delReject.statusCode, 400);
+    assert.ok(delReject.body.error.includes("natitirang utang"));
+  });
+
+  // ==========================================================================
+  // 15. WILDCARD ROUTING & JSON 404 RESILIENCE (EXPRESS 5 COMPATIBILITY)
+  // ==========================================================================
+  test("15. Unmatched API routes return JSON 404 and non-API requests fallback without PathError", async () => {
+    // Unmatched API endpoint MUST return JSON 404, never HTML
+    const api404 = await invokeAppRequest("GET", "/api/nonexistent_test_route");
+    assert.equal(api404.statusCode, 404);
+    assert.ok(api404.body.error);
+    assert.ok(api404.body.error.includes("API endpoint not found"));
+
+    const apiPost404 = await invokeAppRequest("POST", "/api/nonexistent_post_route");
+    assert.equal(apiPost404.statusCode, 404);
+    assert.ok(apiPost404.body.error);
+
+    // Non-API route falls back to SPA index.html cleanly
+    const spaFallback = await invokeAppRequest("GET", "/store-dashboard");
+    assert.equal(spaFallback.statusCode, 200);
+    assert.ok(spaFallback.text.includes("<!DOCTYPE html>"));
+  });
 });
+

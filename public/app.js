@@ -34,6 +34,8 @@
     },
     customerSearchQuery: "",
     customerRiskFilter: "all",
+    productSearchQuery: "",
+    productCategoryFilter: "all",
     tingiPresets: [1, 2, 5, 10, 15, 20, 50],
     quickPayPresets: [20, 50, 100, 200, 500, 1000],
     stapleProducts: [
@@ -1234,7 +1236,338 @@
   }
 
   // ==========================================================================
-  // Rendering Routines: Tab 1 (Talaan), Tab 2 (Benta), Tab 3 (Bayad)
+  // Tab 1: Paninda (Inventory Products CRUD & Stock Tracking)
+  // ==========================================================================
+
+  function renderPanindaTab() {
+    const products = appState.stapleProducts || [];
+    const container = document.getElementById("products-inventory-list");
+    if (!container) return;
+
+    // Summary counts
+    const totalCountEl = document.getElementById("paninda-total-count");
+    const inStockEl = document.getElementById("paninda-in-stock-count");
+    const lowStockEl = document.getElementById("paninda-low-stock-count");
+
+    const inStockCount = products.filter(p => (p.stock || 0) > 0).length;
+    const lowStockCount = products.filter(p => (p.stock || 0) <= 5).length;
+
+    if (totalCountEl) totalCountEl.textContent = `${products.length} Paninda`;
+    if (inStockEl) inStockEl.textContent = String(inStockCount);
+    if (lowStockEl) {
+      lowStockEl.textContent = String(lowStockCount);
+      lowStockEl.style.color = lowStockCount > 0 ? "var(--accent-rose)" : "var(--accent-green)";
+    }
+
+    const searchQuery = (appState.productSearchQuery || "").trim().toLowerCase();
+    const catFilter = appState.productCategoryFilter || "all";
+
+    const filtered = products.filter(p => {
+      if (catFilter === "low-stock") {
+        if ((p.stock || 0) > 5) return false;
+      } else if (catFilter !== "all" && p.category !== catFilter) {
+        return false;
+      }
+      if (searchQuery) {
+        const hay = `${p.name} ${p.category || ""} ${p.subtitle || ""}`.toLowerCase();
+        return hay.includes(searchQuery);
+      }
+      return true;
+    });
+
+    container.innerHTML = "";
+
+    if (filtered.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state-card" style="grid-column: 1 / -1;">
+          <span class="empty-state-icon" aria-hidden="true">📦</span>
+          <span class="empty-state-title">Walang nahanap na paninda</span>
+          <span style="font-size: 13px; font-weight: 700;">Subukang maghanap ng ibang pangalan o magdagdag ng bagong paninda.</span>
+        </div>
+      `;
+      return;
+    }
+
+    filtered.forEach(prod => {
+      const isLow = (prod.stock || 0) <= 5;
+      const card = document.createElement("div");
+      card.className = "product-inventory-card";
+      card.innerHTML = `
+        <div class="product-card-left">
+          <span class="product-card-icon" aria-hidden="true">${prod.emoji || prod.icon || "📦"}</span>
+          <div class="product-card-details">
+            <span class="product-card-title">${prod.name}</span>
+            <span class="product-card-sub">${prod.category || "Paninda"}${prod.subtitle ? ` • ${prod.subtitle}` : ""}</span>
+            <div class="product-card-pricing">
+              <span class="product-price-tag">₱${Number(prod.price).toFixed(2)}</span>
+              ${prod.cost ? `<span class="product-cost-tag">Puhunan: ₱${Number(prod.cost).toFixed(2)}</span>` : ""}
+            </div>
+          </div>
+        </div>
+        <div class="product-card-stock">
+          <span class="stock-pill ${isLow ? "is-low-stock" : ""}">
+            ${isLow ? "⚠️" : "📦"} ${prod.stock ?? 0} sa stock
+          </span>
+          <div class="product-card-actions">
+            <button class="btn-action-small btn-edit-product touch-target" type="button" data-id="${prod.id}" title="I-edit">
+              ✏️ Edit
+            </button>
+            <button class="btn-action-small btn-action-delete btn-delete-product touch-target" type="button" data-id="${prod.id}" title="Burahin">
+              🗑️
+            </button>
+          </div>
+        </div>
+      `;
+
+      card.querySelector(".btn-edit-product").addEventListener("click", () => openProductModal(prod.id));
+      card.querySelector(".btn-delete-product").addEventListener("click", () => deleteProduct(prod.id));
+      container.appendChild(card);
+    });
+  }
+
+  function openProductModal(prodId = null) {
+    playSound("tap");
+    const backdrop = document.getElementById("product-modal-backdrop");
+    const heading = document.getElementById("modal-product-heading");
+    const idInput = document.getElementById("input-product-id");
+    const nameInput = document.getElementById("input-product-name");
+    const catInput = document.getElementById("input-product-category");
+    const priceInput = document.getElementById("input-product-price");
+    const costInput = document.getElementById("input-product-cost");
+    const stockInput = document.getElementById("input-product-stock");
+
+    if (prodId) {
+      const prod = (appState.stapleProducts || []).find(p => p.id === prodId);
+      if (!prod) return;
+      heading.textContent = `✏️ I-Edit ang Paninda`;
+      idInput.value = prod.id;
+      nameInput.value = prod.name;
+      catInput.value = prod.category || "Inumin";
+      priceInput.value = prod.price;
+      costInput.value = prod.cost ?? "";
+      stockInput.value = prod.stock ?? 20;
+    } else {
+      heading.textContent = "📦 Magdagdag ng Bagong Paninda";
+      idInput.value = "";
+      nameInput.value = "";
+      catInput.value = "Inumin";
+      priceInput.value = "";
+      costInput.value = "";
+      stockInput.value = "20";
+    }
+
+    backdrop.classList.add("is-active");
+    setTimeout(() => nameInput.focus(), 60);
+  }
+
+  function closeProductModal() {
+    const backdrop = document.getElementById("product-modal-backdrop");
+    if (backdrop) backdrop.classList.remove("is-active");
+  }
+
+  async function saveProductModalForm() {
+    const idInput = document.getElementById("input-product-id");
+    const nameInput = document.getElementById("input-product-name");
+    const catInput = document.getElementById("input-product-category");
+    const priceInput = document.getElementById("input-product-price");
+    const costInput = document.getElementById("input-product-cost");
+    const stockInput = document.getElementById("input-product-stock");
+
+    const id = (idInput.value || "").trim();
+    const name = (nameInput.value || "").trim();
+    const category = catInput.value || "Paninda";
+    const price = round2(priceInput.value || 0);
+    const cost = costInput.value ? round2(costInput.value) : 0;
+    const stock = parseInt(stockInput.value, 10) || 0;
+
+    if (!name || name.length < 2) {
+      playSound("alert");
+      showToast("Pakilagay ang pangalan ng paninda.", "warning");
+      nameInput.focus();
+      return;
+    }
+    if (price <= 0) {
+      playSound("alert");
+      showToast("Ang presyo ay dapat mas malaki sa ₱0.", "warning");
+      priceInput.focus();
+      return;
+    }
+
+    const payload = { name, category, price, cost, stock };
+
+    try {
+      if (id) {
+        const { data } = await apiRequest(`/api/products/${id}`, {
+          method: "PUT",
+          body: JSON.stringify(payload)
+        });
+        const updated = data && data.product ? data.product : { id, ...payload, emoji: "📦" };
+        const idx = (appState.stapleProducts || []).findIndex(p => p.id === id);
+        if (idx !== -1) {
+          appState.stapleProducts[idx] = {
+            ...appState.stapleProducts[idx],
+            ...updated,
+            emoji: updated.emoji || appState.stapleProducts[idx].emoji || "📦"
+          };
+        }
+      } else {
+        const { data } = await apiRequest("/api/products", {
+          method: "POST",
+          body: JSON.stringify(payload)
+        });
+        const created = data && data.product ? data.product : { id: `p_${Date.now()}`, ...payload, emoji: "📦" };
+        if (!appState.stapleProducts) appState.stapleProducts = [];
+        appState.stapleProducts.push({
+          ...created,
+          emoji: created.emoji || "📦"
+        });
+      }
+      updateSyncBadge(true);
+    } catch (_) {
+      updateSyncBadge(false);
+      if (id) {
+        const idx = (appState.stapleProducts || []).findIndex(p => p.id === id);
+        if (idx !== -1) {
+          appState.stapleProducts[idx] = { ...appState.stapleProducts[idx], ...payload };
+        }
+      } else {
+        appState.stapleProducts.push({ id: `p_${Date.now()}`, ...payload, emoji: "📦" });
+      }
+    }
+
+    playSound("stamp");
+    closeProductModal();
+    saveLocalState();
+    renderAll();
+    showToast(id ? `Na-update ang panindang ${name}!` : `Naidagdag ang ${name}!`, "success");
+  }
+
+  async function deleteProduct(prodId) {
+    const prod = (appState.stapleProducts || []).find(p => p.id === prodId);
+    if (!prod) return;
+    if (!confirm(`Sigurado ka bang nais mong burahin ang "${prod.name}" sa imbentaryo?`)) return;
+
+    try {
+      await apiRequest(`/api/products/${prodId}`, { method: "DELETE" });
+      updateSyncBadge(true);
+    } catch (_) {
+      updateSyncBadge(false);
+    }
+
+    appState.stapleProducts = (appState.stapleProducts || []).filter(p => p.id !== prodId);
+    playSound("tap");
+    saveLocalState();
+    renderAll();
+    showToast(`Nabura ang paninda: ${prod.name}`, "info");
+  }
+
+  // ==========================================================================
+  // Quick Utang Modal (BankAccount Charge Action)
+  // ==========================================================================
+
+  function openQuickUtangModal() {
+    const cust = getSelectedCustomer();
+    if (!cust) return;
+    playSound("tap");
+    const backdrop = document.getElementById("quick-utang-modal-backdrop");
+    const nameEl = document.getElementById("quick-utang-cust-name");
+    const idInput = document.getElementById("quick-utang-cust-id");
+    const amtInput = document.getElementById("input-quick-utang-amount");
+    const notesInput = document.getElementById("input-quick-utang-notes");
+
+    if (nameEl) nameEl.textContent = cust.name;
+    if (idInput) idInput.value = cust.id;
+    if (amtInput) amtInput.value = "";
+    if (notesInput) notesInput.value = "";
+
+    backdrop.classList.add("is-active");
+    setTimeout(() => {
+      if (amtInput) amtInput.focus();
+    }, 60);
+  }
+
+  function closeQuickUtangModal() {
+    const backdrop = document.getElementById("quick-utang-modal-backdrop");
+    if (backdrop) backdrop.classList.remove("is-active");
+  }
+
+  async function submitQuickUtangForm() {
+    const idInput = document.getElementById("quick-utang-cust-id");
+    const amtInput = document.getElementById("input-quick-utang-amount");
+    const notesInput = document.getElementById("input-quick-utang-notes");
+
+    const customerId = (idInput.value || "").trim();
+    const amount = round2(amtInput.value || 0);
+    const notes = (notesInput.value || "").trim() || "Credit Purchase (Utang)";
+
+    if (!customerId) return;
+    if (amount <= 0) {
+      playSound("alert");
+      showToast("Maglagay ng tamang halaga ng utang (mas malaki sa ₱0).", "warning");
+      amtInput.focus();
+      return;
+    }
+
+    closeQuickUtangModal();
+
+    const cust = appState.customers.find(c => c.id === customerId);
+    if (!cust) return;
+
+    const riskEval = evaluateProjectedUtangRisk(cust, amount);
+    if (riskEval.requiresWarningConfirmation) {
+      openWarningConfirmationModal(riskEval);
+      return;
+    }
+
+    const idempotencyKey = generateIdempotencyKey("utang_quick");
+    try {
+      const { data } = await apiRequest("/api/transactions/utang", {
+        method: "POST",
+        headers: { "X-Idempotency-Key": idempotencyKey },
+        body: JSON.stringify({
+          customerId,
+          amount,
+          items: notes,
+          date: getTodayIso(),
+          acknowledgeWarning: true,
+          forceOverride: true,
+          idempotencyKey
+        })
+      });
+
+      if (data && Array.isArray(data.customers)) {
+        appState.customers = data.customers.map(normalizeCustomerRecord);
+      } else if (data && data.customer) {
+        const idx = appState.customers.findIndex(c => c.id === customerId);
+        if (idx !== -1) {
+          appState.customers[idx] = normalizeCustomerRecord(data.customer);
+        }
+      }
+      updateSyncBadge(true);
+    } catch (err) {
+      updateSyncBadge(false);
+      // Local fallback
+      cust.totalDebt = round2((cust.totalDebt || 0) + amount);
+      cust.balance = cust.totalDebt;
+      cust.history = cust.history || [];
+      cust.history.unshift({
+        id: idempotencyKey,
+        customerId,
+        type: "utang",
+        amount,
+        items: notes,
+        date: getTodayIso()
+      });
+    }
+
+    playSound("cash");
+    saveLocalState();
+    renderAll();
+    showToast(`Naitala ang ₱${amount.toFixed(2)} utang ni ${cust.name}!`, "success");
+  }
+
+  // ==========================================================================
+  // Rendering Routines: Tab 1 (Paninda), Tab 2 (Talaan/Suki), Tab 3 (Benta), Tab 4 (Bayad)
   // ==========================================================================
 
   function renderTalaanTab() {
@@ -1324,8 +1657,11 @@
         chip.setAttribute("aria-selected", isSelected ? "true" : "false");
         chip.className = `customer-chip touch-target ${isSelected ? "active" : ""} ${status.type === "danger" ? "alert-state" : ""}`;
 
+        const isSettled = cust.totalDebt === 0;
         const debtColor =
-          status.type === "danger"
+          isSettled
+            ? "#16a34a"
+            : status.type === "danger"
             ? "var(--accent-rose)"
             : status.type === "watch"
             ? "var(--accent-amber)"
@@ -1339,7 +1675,9 @@
               <span class="traffic-dot ${status.dotClass}" title="${status.label}"></span>
             </div>
             <div class="chip-sub-row">
-              <span class="chip-debt-text" style="color: ${debtColor}">₱${cust.totalDebt.toFixed(2)}</span>
+              <span class="chip-debt-text ${isSettled ? "settled" : ""}" style="color: ${debtColor}">
+                ${isSettled ? "₱0.00 Settled" : `₱${cust.totalDebt.toFixed(2)}`}
+              </span>
               ${draftTotal > 0 ? `<span class="chip-basket-badge" title="May naka-pending sa basket">🛒 ₱${draftTotal.toFixed(0)}</span>` : ""}
             </div>
           </div>
@@ -1369,13 +1707,18 @@
     }
 
     const debtEl = document.getElementById("overview-cust-debt");
-    debtEl.textContent = `₱${cust.totalDebt.toFixed(2)}`;
-    debtEl.style.color =
-      status.type === "danger"
-        ? "var(--accent-rose)"
-        : status.type === "watch"
-        ? "var(--accent-amber)"
-        : "var(--text-primary)";
+    if (cust.totalDebt === 0) {
+      debtEl.textContent = "₱0.00 Settled";
+      debtEl.style.color = "#16a34a";
+    } else {
+      debtEl.textContent = `₱${cust.totalDebt.toFixed(2)}`;
+      debtEl.style.color =
+        status.type === "danger"
+          ? "var(--accent-rose)"
+          : status.type === "watch"
+          ? "var(--accent-amber)"
+          : "var(--text-primary)";
+    }
 
     document.getElementById("overview-cust-limit").textContent = `Limit: ₱${cust.creditLimit.toFixed(2)}`;
 
@@ -1741,6 +2084,7 @@
   }
 
   function renderAll() {
+    renderPanindaTab();
     renderTalaanTab();
     renderBentaTab();
     renderBayadTab();
@@ -1763,7 +2107,7 @@
   }
 
   function setupEventListeners() {
-    // 1. Maya-Style Persistent 3-Tab Bottom Navigation (ARIA Tablist)
+    // 1. 4-Tab Bottom Navigation (ARIA Tablist)
     document.querySelectorAll(".bottom-tab-btn").forEach(btn => {
       btn.addEventListener("click", () => {
         const target = btn.getAttribute("data-target");
@@ -1783,7 +2127,75 @@
 
     document.getElementById("btn-reset-data").addEventListener("click", resetToFactorySeed);
 
-    // 3. Adaptive Customer Search & Risk Filter Controls (>5 Suki Threshold)
+    // 3. Paninda (Inventory) Search & Category Filters
+    const prodSearchInput = document.getElementById("product-search-input");
+    const clearProdSearchBtn = document.getElementById("btn-clear-prod-search");
+    if (prodSearchInput) {
+      prodSearchInput.addEventListener("input", () => {
+        appState.productSearchQuery = prodSearchInput.value || "";
+        if (clearProdSearchBtn) {
+          clearProdSearchBtn.classList.toggle("is-visible", Boolean(appState.productSearchQuery));
+        }
+        renderPanindaTab();
+      });
+    }
+    if (clearProdSearchBtn) {
+      clearProdSearchBtn.addEventListener("click", () => {
+        playSound("tap");
+        appState.productSearchQuery = "";
+        if (prodSearchInput) prodSearchInput.value = "";
+        clearProdSearchBtn.classList.remove("is-visible");
+        renderPanindaTab();
+      });
+    }
+
+    document.querySelectorAll("#prod-category-filter-row .risk-filter-pill").forEach(pill => {
+      pill.addEventListener("click", () => {
+        playSound("tap");
+        const cat = pill.getAttribute("data-prod-cat") || "all";
+        appState.productCategoryFilter = cat;
+        document.querySelectorAll("#prod-category-filter-row .risk-filter-pill").forEach(p => {
+          p.classList.toggle("active", (p.getAttribute("data-prod-cat") || "all") === cat);
+        });
+        renderPanindaTab();
+      });
+    });
+
+    // 4. Paninda Add / Edit Modal Controls
+    const btnOpenAddProd = document.getElementById("btn-open-add-product");
+    if (btnOpenAddProd) {
+      btnOpenAddProd.addEventListener("click", () => openProductModal(null));
+    }
+    const btnCancelProd = document.getElementById("btn-cancel-product");
+    if (btnCancelProd) {
+      btnCancelProd.addEventListener("click", closeProductModal);
+    }
+    const btnSaveProd = document.getElementById("btn-save-product");
+    if (btnSaveProd) {
+      btnSaveProd.addEventListener("click", withActionLock("save-product", saveProductModalForm, 400));
+    }
+
+    // 5. Direct Suki Card Action Buttons
+    const btnCustAddUtang = document.getElementById("btn-customer-add-utang");
+    if (btnCustAddUtang) {
+      btnCustAddUtang.addEventListener("click", openQuickUtangModal);
+    }
+    const btnCustPay = document.getElementById("btn-customer-pay");
+    if (btnCustPay) {
+      btnCustPay.addEventListener("click", () => switchTab("tab-bayad"));
+    }
+
+    // 6. Quick Utang Modal Controls
+    const btnCancelQuickUtang = document.getElementById("btn-cancel-quick-utang");
+    if (btnCancelQuickUtang) {
+      btnCancelQuickUtang.addEventListener("click", closeQuickUtangModal);
+    }
+    const btnSubmitQuickUtang = document.getElementById("btn-submit-quick-utang");
+    if (btnSubmitQuickUtang) {
+      btnSubmitQuickUtang.addEventListener("click", withActionLock("quick-utang", submitQuickUtangForm, 400));
+    }
+
+    // 7. Adaptive Customer Search & Risk Filter Controls (>5 Suki Threshold)
     const searchInput = document.getElementById("customer-search-input");
     const clearSearchBtn = document.getElementById("btn-clear-search");
     if (searchInput) {
@@ -1805,19 +2217,19 @@
       });
     }
 
-    document.querySelectorAll(".risk-filter-pill").forEach(pill => {
+    document.querySelectorAll("#tab-talaan .risk-filter-pill").forEach(pill => {
       pill.addEventListener("click", () => {
         playSound("tap");
         const filterVal = pill.getAttribute("data-risk-filter") || "all";
         appState.customerRiskFilter = filterVal;
-        document.querySelectorAll(".risk-filter-pill").forEach(p => {
+        document.querySelectorAll("#tab-talaan .risk-filter-pill").forEach(p => {
           p.classList.toggle("active", p.getAttribute("data-risk-filter") === filterVal);
         });
         renderTalaanTab();
       });
     });
 
-    // 4. Add New Suki & Edit Credit Limit Modal
+    // 8. Add New Suki & Edit Credit Limit Modal
     document.getElementById("btn-open-add-suki").addEventListener("click", () => openAddSukiModal("create"));
     document.getElementById("btn-edit-limit").addEventListener("click", () => openAddSukiModal("edit-limit"));
     document.getElementById("btn-cancel-suki").addEventListener("click", closeAddSukiModal);
@@ -1826,10 +2238,10 @@
       withActionLock("save-suki", saveSukiModalForm, 400)
     );
 
-    // 5. Kasunduan SMS / Copy
+    // 9. Kasunduan SMS / Copy
     document.getElementById("btn-kasunduan").addEventListener("click", sendKasunduan);
 
-    // 6. Calendar Month Navigations
+    // 10. Calendar Month Navigations
     document.getElementById("btn-cal-prev").addEventListener("click", () => {
       playSound("tap");
       currentCalDate.setMonth(currentCalDate.getMonth() - 1);
@@ -1842,7 +2254,7 @@
       renderCalendar();
     });
 
-    // 7. Bilis-Tingi Micro-Credit Buttons (Scoped lock: "tingi" — does NOT block "ilista")
+    // 11. Bilis-Tingi Micro-Credit Buttons (Scoped lock: "tingi" — does NOT block "ilista")
     const lockedAddTingi = withActionLock("tingi", addTingiToBasket, 180);
     document.querySelectorAll(".btn-tingi-action").forEach(btn => {
       btn.addEventListener("click", () => {
@@ -1851,7 +2263,7 @@
       });
     });
 
-    // 8. Custom Tingi Price Drawer
+    // 12. Custom Tingi Price Drawer
     const toggleCustomTingiBtn = document.getElementById("btn-toggle-custom-tingi");
     const customTingiDrawer = document.getElementById("custom-tingi-drawer");
     if (toggleCustomTingiBtn && customTingiDrawer) {
@@ -1882,13 +2294,13 @@
       withActionLock("custom-tingi", addCustomTingiItem, 250)
     );
 
-    // 9. Clear Basket & Commit Utang ("ILISTA" — Scoped lock: "ilista")
+    // 13. Clear Basket & Commit Utang ("ILISTA" — Scoped lock: "ilista")
     document.getElementById("btn-clear-basket").addEventListener("click", clearBasket);
 
     const lockedSubmitDebt = withActionLock("ilista", () => executeSubmitDebt(false), 400);
     document.getElementById("btn-ilista").addEventListener("click", lockedSubmitDebt);
 
-    // 10. Flexible Warning Mode Confirmation Modal Actions
+    // 14. Flexible Warning Mode Confirmation Modal Actions
     document.getElementById("btn-confirm-warning-override").addEventListener(
       "click",
       withActionLock("ilista-override", () => executeSubmitDebt(true), 400)
@@ -1898,7 +2310,7 @@
       closeWarningConfirmationModal();
     });
 
-    // 11. Quick Pay Chips & Custom Pay Input (Scoped lock: "bayad")
+    // 15. Quick Pay Chips & Custom Pay Input (Scoped lock: "bayad")
     const lockedQuickPay = withActionLock("bayad", executeQuickPay, 400);
     document.querySelectorAll(".btn-quick-pay").forEach(btn => {
       btn.addEventListener("click", () => {
@@ -1913,7 +2325,7 @@
       lockedQuickPay(val);
     });
 
-    // 12. Dismiss Sukli Modal
+    // 16. Dismiss Sukli Modal
     document.getElementById("btn-dismiss-sukli").addEventListener("click", dismissSukliModal);
   }
 
@@ -1934,7 +2346,15 @@
     evaluateProjectedUtangRisk,
     withActionLock,
     round2,
-    bootstrapFromServer
+    bootstrapFromServer,
+    renderPanindaTab,
+    openProductModal,
+    closeProductModal,
+    saveProductModalForm,
+    deleteProduct,
+    openQuickUtangModal,
+    closeQuickUtangModal,
+    submitQuickUtangForm
   };
 
   // Initialize on DOM Ready
